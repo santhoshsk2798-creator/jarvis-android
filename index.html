@@ -11276,18 +11276,6 @@ a{
    2. SAFE PAGE NAVIGATION
    ========================================= */
 
-const SD_VALID_PAGES = new Set([
- "home",
- "chat",
- "voice",
- "calendar",
- "planner",
- "career",
- "applications",
- "moments",
- "settings"
-]);
-
 function sdFinalNavigate(page){
 
  const destination = SD_VALID_PAGES.has(page)
