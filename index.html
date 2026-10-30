@@ -162,6 +162,323 @@ small{color:#a2bed0}
  }
 }
 
+  
+/* =====================================
+   SINDRIX PREMIUM DASHBOARD V1
+   AMOLED BLACK + ELECTRIC BLUE + GOLD
+   ===================================== */
+
+:root{
+ --sd-black:#030710;
+ --sd-navy:#07182b;
+ --sd-panel:#091a2ce8;
+ --sd-blue:#19baff;
+ --sd-gold:#f3c779;
+ --sd-text:#eef7ff;
+ --sd-muted:#9ab8d0;
+}
+
+/* Dashboard background */
+body{
+ background:
+ radial-gradient(ellipse at 50% 15%,#12385a 0%,transparent 48%),
+ radial-gradient(ellipse at 90% 75%,#082e52 0%,transparent 38%),
+ #030710;
+ background-attachment:fixed;
+ color:var(--sd-text);
+ min-height:100vh;
+}
+
+/* Desktop dashboard structure */
+main{
+ max-width:1440px;
+ margin:auto;
+ padding:28px;
+ display:grid;
+ grid-template-columns:minmax(0,1.5fr) minmax(320px,1fr);
+ gap:18px;
+ align-items:start;
+}
+
+/* Main header */
+main .hero{
+ grid-column:1/-1;
+ position:relative;
+ padding:32px 24px;
+ border:1px solid #23658b;
+ border-radius:24px;
+ background:
+ linear-gradient(135deg,#091a2cf0,#061020ee);
+ box-shadow:
+ 0 15px 45px #0008,
+ inset 0 1px 0 #7edcff22;
+ overflow:hidden;
+}
+
+main .hero::before{
+ content:"";
+ position:absolute;
+ inset:0;
+ pointer-events:none;
+ background:
+ radial-gradient(circle at 20% 20%,#1a8eff22,transparent 40%),
+ radial-gradient(circle at 85% 80%,#d5a64c12,transparent 35%);
+}
+
+/* Premium golden title */
+main .hero h1{
+ position:relative;
+ font-family:Georgia,serif;
+ font-weight:400;
+ font-size:clamp(34px,5vw,62px);
+ letter-spacing:clamp(5px,1vw,14px);
+ color:var(--sd-gold);
+ text-shadow:0 0 22px #e6a83f55;
+}
+
+/* Holographic SI intelligence core */
+main .orb{
+ position:relative;
+ width:190px;
+ height:190px;
+ margin:28px auto;
+ border:2px solid #36c8ff;
+ border-radius:50%;
+ background:
+ radial-gradient(circle,#123d68 0%,#071528 55%,#020814 100%);
+ box-shadow:
+ 0 0 25px #008cff88,
+ 0 0 70px #0077ff33,
+ inset 0 0 38px #007bff55;
+ font-size:0;
+ animation:sd-core-glow 4s ease-in-out infinite;
+}
+
+/* Replace the old circle visually with SI */
+main .orb::before{
+ content:"SI";
+ font:72px Georgia,serif;
+ color:#ffd48a;
+ text-shadow:0 0 20px #ffb347;
+ position:absolute;
+ left:50%;
+ top:42%;
+ transform:translate(-50%,-50%);
+}
+
+/* Small golden heart */
+main .orb::after{
+ content:"♥";
+ position:absolute;
+ left:50%;
+ top:69%;
+ transform:translate(-50%,-50%);
+ font-size:25px;
+ color:#ffd28a;
+ text-shadow:0 0 15px #ffac37;
+}
+
+/* Header subtitle */
+main .hero .muted{
+ position:relative;
+ color:#b8d6e8;
+ font-size:12px;
+ letter-spacing:3px;
+ text-transform:uppercase;
+}
+
+/* Glass-effect panels */
+main .card{
+ margin:0;
+ min-width:0;
+ padding:24px;
+ border-radius:20px;
+ background:linear-gradient(145deg,#0c2035f2,#06111ff5);
+ border:1px solid #245b80;
+ box-shadow:
+ 0 12px 32px #0006,
+ inset 0 1px 0 #a6e6ff13;
+ transition:border-color .25s,box-shadow .25s;
+}
+
+main .card:hover{
+ border-color:#238cba;
+ box-shadow:0 12px 35px #0008,0 0 18px #008cff18;
+}
+
+main .card h2{
+ margin:0 0 18px;
+ font-size:19px;
+ font-weight:600;
+ color:#f2ca83;
+ letter-spacing:.5px;
+}
+
+/* Layout positions */
+main > section.card:nth-of-type(1){
+ grid-column:1;
+}
+
+main > section.card:nth-of-type(2){
+ grid-column:2;
+ grid-row:2 / span 2;
+}
+
+main > section.card:nth-of-type(3){
+ grid-column:1;
+}
+
+main > section.card:nth-of-type(4){
+ grid-column:1/-1;
+}
+
+/* Premium inputs */
+main input:not([type=file]),
+main select,
+main textarea{
+ background:#061323;
+ border:1px solid #295474;
+ border-radius:12px;
+ color:#f0f8ff;
+ padding:13px 15px;
+ outline:none;
+ transition:border-color .2s,box-shadow .2s;
+}
+
+main input:focus,
+main select:focus,
+main textarea:focus{
+ border-color:#28bfff;
+ box-shadow:0 0 0 3px #008cff20;
+}
+
+main input::placeholder,
+main textarea::placeholder{
+ color:#819bb2;
+}
+
+/* Buttons */
+main button{
+ background:linear-gradient(135deg,#058ac7,#18c8f2);
+ color:#03101c;
+ border:1px solid #45d8ff;
+ border-radius:11px;
+ padding:12px 17px;
+ font-weight:700;
+ transition:transform .2s,filter .2s;
+}
+
+main button:hover{
+ filter:brightness(1.12);
+ transform:translateY(-2px);
+}
+
+main button.secondary{
+ background:#102b46;
+ color:#d5f3ff;
+ border-color:#236a9b;
+}
+
+main button.danger{
+ background:#4b1c30;
+ border-color:#a34662;
+ color:#fff;
+}
+
+/* Application list */
+main .item{
+ background:#07182a;
+ border:1px solid #204b6b;
+ border-radius:12px;
+ padding:15px;
+ margin:12px 0;
+}
+
+main .item strong{
+ color:#f3c779;
+}
+
+main .muted,
+main small{
+ color:var(--sd-muted);
+}
+
+/* Response panel */
+#answer{
+ background:#061526;
+ border-left:3px solid #e7b76b;
+ border-radius:8px;
+ padding:15px;
+ line-height:1.6;
+ overflow-wrap:anywhere;
+}
+
+/* Footer privacy message */
+main > p.muted{
+ grid-column:1/-1;
+ text-align:center;
+ font-size:12px;
+ line-height:1.7;
+}
+
+/* SI orb animation */
+@keyframes sd-core-glow{
+ 0%,100%{
+  box-shadow:0 0 25px #008cff88,
+  0 0 60px #0077ff22,
+  inset 0 0 35px #007bff44;
+ }
+ 50%{
+  box-shadow:0 0 42px #008cffbb,
+  0 0 90px #0077ff44,
+  inset 0 0 50px #007bff66;
+ }
+}
+
+/* Mobile layout */
+@media(max-width:800px){
+ main{
+  display:flex;
+  flex-direction:column;
+  gap:15px;
+  padding:14px;
+ }
+ main > *{
+  width:100%;
+ }
+ main .hero{
+  padding:28px 15px;
+ }
+ main .orb{
+  width:155px;
+  height:155px;
+ }
+ main .orb::before{
+  font-size:60px;
+ }
+ main .hero .muted{
+  font-size:10px;
+  letter-spacing:1.5px;
+ }
+ main .card{
+  padding:18px;
+ }
+ main .actions button{
+  min-width:90px;
+ }
+}
+
+/* Accessibility */
+@media(prefers-reduced-motion:reduce){
+ main .orb{
+  animation:none;
+ }
+ main button,
+ main .card{
+  transition:none;
+ }
+}
+
 </style>
 </head>
 <body>
