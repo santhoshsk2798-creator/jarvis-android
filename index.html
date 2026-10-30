@@ -3800,6 +3800,15 @@ try {
     });
   }
 
+
+  
+  /* STEP 13B — LIVE MOMENTS SYNC */
+
+  document.addEventListener('sindrix:moments-updated', () => {
+    renderCalendar();
+    showEvents(selectedDate);
+  });
+
   renderCalendar();
   showEvents(selectedDate);
 
@@ -3843,6 +3852,9 @@ try {
   function save() {
     try {
       localStorage.setItem(KEY, JSON.stringify(moments));
+       document.dispatchEvent(
+        new Event('sindrix:moments-updated')
+      );
       return true;
     } catch (error) {
       alert('Unable to save moments in this browser.');
