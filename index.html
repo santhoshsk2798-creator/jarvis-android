@@ -2341,6 +2341,211 @@ document.querySelectorAll('.sd-suggestion').forEach(button => {
 });
 
 
+
+  
+/* =========================================
+   SINDRIX PERSONAL PLANNER
+   STEP 10C — TASK MANAGEMENT
+   Santhosh ♥ Indhu
+   ========================================= */
+
+(function initSindrixPlanner() {
+
+  const STORAGE_KEY = 'sindrix_personal_tasks_v1';
+
+  const form = document.getElementById('sd-task-form');
+  const list = document.getElementById('sd-task-list');
+
+  if (!form || !list) return;
+
+  const nameInput = document.getElementById('sd-task-name');
+  const ownerInput = document.getElementById('sd-task-owner');
+  const categoryInput = document.getElementById('sd-task-category');
+  const dateInput = document.getElementById('sd-task-date');
+
+  let tasks = [];
+
+  // Load previously saved tasks
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    if (Array.isArray(saved)) {
+      tasks = saved;
+    }
+  } catch (error) {
+    console.warn('Could not load SINDRIX tasks:', error);
+  }
+
+  function saveTasks() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+      return true;
+    } catch (error) {
+      console.error('Could not save SINDRIX tasks:', error);
+      alert('Task changes could not be saved. Check browser storage.');
+      return false;
+    }
+  }
+
+  function updateStats() {
+    const total = tasks.length;
+    const completed = tasks.filter(task => task.completed).length;
+    const pending = total - completed;
+
+    document.getElementById('sd-task-total').textContent = total;
+    document.getElementById('sd-task-pending').textContent = pending;
+    document.getElementById('sd-task-completed').textContent = completed;
+  }
+
+  function renderTasks() {
+    list.replaceChildren();
+
+    updateStats();
+
+    if (tasks.length === 0) {
+      const empty = document.createElement('p');
+      empty.className = 'muted';
+      empty.textContent = 'No tasks yet. Add your first task above!';
+      list.appendChild(empty);
+      return;
+    }
+
+    tasks.forEach(task => {
+
+      const card = document.createElement('div');
+      card.className = 'sd-task-card';
+      card.style.cssText = `
+        display:flex;
+        align-items:center;
+        gap:12px;
+        padding:14px;
+        border:1px solid #29516d;
+        border-radius:12px;
+        background:#0a1d2e;
+        margin-bottom:10px;
+      `;
+
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.checked = Boolean(task.completed);
+      checkbox.setAttribute('aria-label', 'Complete ' + task.name);
+      checkbox.style.cssText = `
+        width:20px;
+        height:20px;
+        flex-shrink:0;
+        accent-color:#d6a74a;
+        cursor:pointer;
+      `;
+
+      checkbox.addEventListener('change', () => {
+        const previous = task.completed;
+        task.completed = checkbox.checked;
+
+        if (!saveTasks()) {
+          task.completed = previous;
+        }
+
+        renderTasks();
+      });
+
+      const details = document.createElement('div');
+      details.style.cssText = 'flex:1;min-width:0;';
+
+      const title = document.createElement('strong');
+      title.textContent = task.name;
+      title.style.cssText = `
+        display:block;
+        color:#edf6ff;
+        overflow-wrap:anywhere;
+        text-decoration:${task.completed ? 'line-through' : 'none'};
+        opacity:${task.completed ? '.55' : '1'};
+      `;
+
+      const meta = document.createElement('small');
+      meta.textContent =
+        task.owner + ' · ' +
+        task.category +
+        (task.date ? ' · Due: ' + task.date : '');
+
+      meta.style.cssText = `
+        display:block;
+        margin-top:5px;
+        color:#a8c2d5;
+        overflow-wrap:anywhere;
+      `;
+
+      details.append(title, meta);
+
+      const deleteButton = document.createElement('button');
+      deleteButton.type = 'button';
+      deleteButton.textContent = '✕';
+      deleteButton.setAttribute('aria-label', 'Delete ' + task.name);
+      deleteButton.title = 'Delete task';
+
+      deleteButton.style.cssText = `
+        width:38px;
+        height:38px;
+        flex-shrink:0;
+        padding:0;
+        border:1px solid #75404b;
+        border-radius:9px;
+        background:#321722;
+        color:#ffb7bf;
+        cursor:pointer;
+      `;
+
+      deleteButton.addEventListener('click', () => {
+        if (!confirm('Delete this task?')) return;
+
+        const previousTasks = [...tasks];
+        tasks = tasks.filter(item => item.id !== task.id);
+
+        if (!saveTasks()) {
+          tasks = previousTasks;
+        }
+
+        renderTasks();
+      });
+
+      card.append(checkbox, details, deleteButton);
+      list.appendChild(card);
+    });
+  }
+
+  form.addEventListener('submit', event => {
+    event.preventDefault();
+
+    const name = nameInput.value.trim();
+
+    if (!name) return;
+
+    const newTask = {
+      id: window.crypto && crypto.randomUUID
+        ? crypto.randomUUID()
+        : Date.now().toString() + Math.random().toString(36),
+      name: name,
+      owner: ownerInput.value,
+      category: categoryInput.value,
+      date: dateInput.value,
+      completed: false
+    };
+
+    tasks.unshift(newTask);
+
+    if (!saveTasks()) {
+      tasks.shift();
+      renderTasks();
+      return;
+    }
+
+    form.reset();
+    renderTasks();
+    nameInput.focus();
+  });
+
+  renderTasks();
+
+})();
+
   
 </script>
 </body>
