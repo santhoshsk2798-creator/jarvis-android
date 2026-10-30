@@ -4412,6 +4412,94 @@ try {
 
 })();
 
+
+/* STEP 14C — SINDRIX LIVE DAILY BRIEFING */
+(function initSindrixDailyBriefing() {
+  const TASK_KEY = 'sindrix_personal_tasks_v1';
+  const MOMENT_KEY = 'sindrix_special_moments_v1';
+
+  function readSaved(key) {
+    try {
+      const data = JSON.parse(localStorage.getItem(key) || '[]');
+      return Array.isArray(data) ? data : [];
+    } catch (error) {
+      return [];
+    }
+  }
+
+  function localDate(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  function updateBriefing() {
+    const today = localDate(new Date());
+    const tasks = readSaved(TASK_KEY);
+    const moments = readSaved(MOMENT_KEY);
+
+    const pendingToday = tasks.filter(task =>
+      task.date === today && !task.completed
+    ).length;
+
+    const upcomingMoments = moments.filter(moment => {
+      if (!moment.date) return false;
+
+      if (moment.repeat) {
+        const parts = moment.date.split('-');
+        if (parts.length !== 3) return false;
+
+        const thisYear = new Date().getFullYear();
+        let next = `${thisYear}-${parts[1]}-${parts[2]}`;
+
+        if (next < today) {
+          next = `${thisYear + 1}-${parts[1]}-${parts[2]}`;
+        }
+
+        return next >= today;
+      }
+
+      return moment.date >= today;
+    }).length;
+
+    const taskElement = document.getElementById('sd-briefing-tasks');
+    const momentElement = document.getElementById('sd-briefing-moments');
+    const interviewElement = document.getElementById('sd-briefing-interviews');
+    const summaryElement = document.getElementById('sd-briefing-summary');
+
+    if (taskElement) taskElement.textContent = pendingToday;
+    if (momentElement) momentElement.textContent = upcomingMoments;
+
+    // Interview integration will use the existing
+    // job-application data structure in the next part.
+    if (interviewElement) interviewElement.textContent = '—';
+
+    if (summaryElement) {
+      summaryElement.textContent =
+        `You have ${pendingToday} pending task(s) today and ` +
+        `${upcomingMoments} upcoming special moment(s). ` +
+        `Keep moving forward, one beautiful day at a time. ♡`;
+    }
+  }
+
+  updateBriefing();
+
+  document.addEventListener(
+    'sindrix:moments-updated',
+    updateBriefing
+  );
+
+  document.addEventListener(
+    'sindrix:tasks-updated',
+    updateBriefing
+  );
+
+  window.addEventListener('focus', updateBriefing);
+  window.addEventListener('pageshow', updateBriefing);
+})();
+
+  
   
 </script>
 </body>
