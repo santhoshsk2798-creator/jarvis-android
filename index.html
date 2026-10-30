@@ -769,6 +769,121 @@ main > p.muted{
  }
 }
 
+
+/* SINDRIX QUICK ACTION PREMIUM DESIGN */
+
+.sd-quick-section{
+ grid-column:1/-1;
+ width:100%;
+ min-width:0;
+ padding:22px;
+ border:1px solid #245b80;
+ border-radius:20px;
+ background:linear-gradient(145deg,#0b1d30,#050e1b);
+ box-shadow:0 12px 35px #0006;
+}
+
+.sd-section-heading{
+ display:flex;
+ align-items:end;
+ justify-content:space-between;
+ gap:12px;
+ margin-bottom:20px;
+}
+
+.sd-overline{
+ color:#51c7ff;
+ font-size:10px;
+ letter-spacing:2px;
+}
+
+.sd-section-heading h2{
+ color:#f3c779;
+ font-size:22px;
+ margin:6px 0 0;
+}
+
+.sd-section-note{
+ color:#9ab8d0;
+ font-size:12px;
+}
+
+.sd-quick-grid{
+ display:grid;
+ grid-template-columns:repeat(4,minmax(0,1fr));
+ gap:14px;
+}
+
+.sd-quick-card{
+ min-width:0;
+ min-height:155px;
+ display:flex;
+ flex-direction:column;
+ align-items:flex-start;
+ justify-content:center;
+ gap:10px;
+ text-align:left;
+ padding:20px;
+ border:1px solid #206c99;
+ border-radius:16px;
+ background:linear-gradient(145deg,#102a45,#061525);
+ color:#eef7ff;
+ cursor:pointer;
+ transition:transform .2s,border-color .2s,box-shadow .2s;
+}
+
+.sd-quick-card:hover{
+ transform:translateY(-4px);
+ border-color:#37c7ff;
+ box-shadow:0 0 25px #008cff33;
+}
+
+.sd-quick-icon{
+ font-size:27px;
+}
+
+.sd-quick-card strong{
+ color:#f5d49b;
+ font-size:14px;
+}
+
+.sd-quick-card small{
+ color:#9ab8d0;
+ font-size:11px;
+}
+
+@media(max-width:1100px){
+ .sd-quick-grid{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+ }
+}
+
+@media(max-width:480px){
+ .sd-quick-section{
+  padding:16px;
+ }
+
+ .sd-quick-grid{
+  gap:10px;
+ }
+
+ .sd-quick-card{
+  padding:14px;
+  min-height:145px;
+ }
+
+ .sd-quick-card strong{
+  font-size:12px;
+ }
+}
+
+@media(prefers-reduced-motion:reduce){
+ .sd-quick-card{
+  transition:none;
+ }
+}
+
+
   
 </style>
 </head>
