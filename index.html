@@ -616,6 +616,160 @@ main > p.muted{
  }
 }
 
+/* SINDRIX HOLOGRAPHIC WELCOME SCREEN */
+.sd-hero{
+ position:relative;
+ overflow:hidden;
+ min-height:400px;
+}
+.sd-hero-layout{
+ position:relative;
+ z-index:1;
+ display:grid;
+ grid-template-columns:minmax(240px,1fr) minmax(0,1fr);
+ align-items:center;
+ gap:35px;
+}
+.sd-hero-core{
+ position:relative;
+ width:min(100%,310px);
+ aspect-ratio:1;
+ margin:auto;
+ display:grid;
+ place-items:center;
+ border-radius:50%;
+ background:
+ radial-gradient(circle at 50% 50%,#123c69 0%,#07182c 45%,transparent 70%);
+ filter:drop-shadow(0 0 25px #008cff88);
+}
+.sd-holo-ring{
+ position:absolute;
+ border-radius:50%;
+ border:2px solid #2dc4ff;
+ box-shadow:0 0 20px #008cff,inset 0 0 18px #008cff55;
+}
+.sd-holo-ring-1{
+ inset:0;
+ border-style:dashed;
+ animation:sd-holo-spin 12s linear infinite;
+}
+.sd-holo-ring-2{
+ inset:11%;
+ border-color:#e7ba6c;
+ transform:rotateX(65deg);
+ animation:sd-holo-spin-reverse 8s linear infinite;
+}
+.sd-holo-ring-3{
+ inset:22%;
+ border-style:dotted;
+ animation:sd-holo-spin 6s linear infinite;
+}
+.sd-holo-center{
+ position:relative;
+ z-index:2;
+ display:flex;
+ flex-direction:column;
+ align-items:center;
+ justify-content:center;
+ width:46%;
+ aspect-ratio:1;
+ border-radius:50%;
+ background:radial-gradient(circle,#164b7c,#041326);
+ border:1px solid #dfb66a;
+ box-shadow:0 0 28px #1c9fff88,inset 0 0 24px #007bff55;
+}
+.sd-holo-center>span:first-child{
+ font:clamp(42px,6vw,78px) Georgia,serif;
+ color:#ffd58a;
+ text-shadow:0 0 20px #e9a744;
+}
+.sd-holo-heart{
+ font-size:25px;
+ color:#ffd18a;
+ text-shadow:0 0 15px #ffac37;
+}
+.sd-hero-copy{
+ text-align:left;
+}
+.sd-eyebrow{
+ font-size:11px;
+ letter-spacing:2px;
+ color:#61cfff;
+ margin-bottom:20px;
+}
+.sd-greeting{
+ color:#c2d7e8;
+ font-size:15px;
+}
+.sd-hero-copy h1{
+ font-family:system-ui,Arial,sans-serif!important;
+ font-size:clamp(29px,3vw,44px)!important;
+ letter-spacing:-1px!important;
+ color:#f2f8ff!important;
+ font-weight:600!important;
+ line-height:1.15;
+}
+.sd-hero-copy h1 span{
+ display:block;
+ font-family:Georgia,serif;
+ font-size:clamp(42px,5vw,64px);
+ letter-spacing:6px;
+ color:#f3c779;
+ text-shadow:0 0 20px #dca34255;
+}
+.sd-hero-description{
+ max-width:450px;
+ line-height:1.7;
+ color:#b8d0e1;
+ font-size:14px;
+}
+.sd-hero-signature{
+ margin-top:25px;
+ font-size:12px;
+ letter-spacing:4px;
+ color:#e4eef8;
+}
+.sd-hero-signature span{
+ color:#f3c779;
+ margin:0 8px;
+}
+.sd-hero-tagline{
+ margin-top:12px;
+ color:#f3c779;
+ font:italic 15px Georgia,serif;
+}
+@keyframes sd-holo-spin{
+ to{transform:rotate(360deg)}
+}
+@keyframes sd-holo-spin-reverse{
+ to{transform:rotate(-360deg)}
+}
+@media(max-width:800px){
+ .sd-hero-layout{
+  grid-template-columns:1fr;
+  gap:15px;
+ }
+ .sd-hero-core{
+  width:min(72vw,250px);
+ }
+ .sd-hero-copy{
+  text-align:center;
+ }
+ .sd-hero-description{
+  margin-left:auto;
+  margin-right:auto;
+ }
+ .sd-hero-signature{
+  letter-spacing:2px;
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ .sd-holo-ring{
+  animation:none;
+ }
+}
+
+  
 </style>
 </head>
 <body>
@@ -690,11 +844,41 @@ main > p.muted{
 
 
 <main>
-<header class="hero">
-<h1>SINDRIX</h1>
-<div class="orb">◉</div>
-<div class="muted">SANTHOSH &amp; INDHU'S PERSONAL AI ASSISTANT</div>
+
+<header class="hero sd-hero">
+  <div class="sd-hero-layout">
+
+    <div class="sd-hero-core">
+      <div class="sd-holo-ring sd-holo-ring-1"></div>
+      <div class="sd-holo-ring sd-holo-ring-2"></div>
+      <div class="sd-holo-ring sd-holo-ring-3"></div>
+
+      <div class="sd-holo-center">
+        <span>SI</span>
+        <span class="sd-holo-heart">♥</span>
+      </div>
+    </div>
+
+    <div class="sd-hero-copy">
+      <div class="sd-eyebrow">✦ YOUR PERSONAL INTELLIGENCE</div>
+      <p class="sd-greeting">Good to see you, Santhosh 👋</p>
+      <h1>Welcome to <span>SINDRIX</span></h1>
+      <p class="sd-hero-description">
+        Your personal assistant, built with love for
+        Santhosh and Indhu. Here to help you organize,
+        learn, plan, and achieve more together.
+      </p>
+      <div class="sd-hero-signature">
+        SANTHOSH <span>♥</span> INDHU
+      </div>
+      <p class="sd-hero-tagline">
+        Built with Love. Powered by Intelligence.
+      </p>
+    </div>
+
+  </div>
 </header>
+
 
 <section class="card">
 <h2>Ask SINDRIX</h2>
