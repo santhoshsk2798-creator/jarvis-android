@@ -1970,6 +1970,43 @@ render = function(){
 /* Show statistics immediately */
 updateSindrixOverview();
 
+
+/* =====================================
+   SINDRIX SMART COMMAND ACTIVATION
+   STEP 9C
+   ===================================== */
+
+document.querySelectorAll('.sd-suggestion').forEach(button => {
+
+  button.addEventListener('click', () => {
+
+    const command = button.dataset.sdCommand;
+
+    if (!command) return;
+
+    // Display the selected command in the input
+    document.getElementById('command').value = command;
+
+    // Handle the applications shortcut
+    if (command === 'Show my applications') {
+
+      const summary = apps.length
+        ? apps.map(a => `${a.company}: ${a.status}`)
+              .join('. ')
+        : 'No applications recorded yet.';
+
+      say(summary);
+      return;
+    }
+
+    // Use the existing SINDRIX command engine
+    ask(command);
+
+  });
+
+});
+
+
   
 </script>
 </body>
