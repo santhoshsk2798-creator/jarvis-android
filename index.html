@@ -1626,6 +1626,63 @@ document.querySelectorAll('[data-sd-action]').forEach(card => {
 });
 
 
+
+/* SINDRIX LIVE CAREER OVERVIEW */
+
+function updateSindrixOverview(){
+
+  const total = apps.length;
+
+  const interviews = apps.filter(a =>
+    a.status === 'Interview'
+  ).length;
+
+  const offers = apps.filter(a =>
+    a.status === 'Offer'
+  ).length;
+
+  const today = new Date();
+  today.setHours(0,0,0,0);
+
+  const upcoming = apps.filter(a => {
+    if(!a.interview) return false;
+
+    const date = new Date(a.interview + 'T00:00:00');
+
+    return !isNaN(date.getTime()) &&
+           date >= today &&
+           a.status !== 'Rejected' &&
+           a.status !== 'Withdrawn';
+  }).length;
+
+  const values = {
+    'sd-total-apps': total,
+    'sd-interviews': interviews,
+    'sd-offers': offers,
+    'sd-upcoming': upcoming
+  };
+
+  Object.entries(values).forEach(([id,value]) => {
+    const element = document.getElementById(id);
+
+    if(element){
+      element.textContent = value;
+    }
+  });
+}
+
+/* Refresh overview whenever applications change */
+
+const originalSindrixRender = render;
+
+render = function(){
+  originalSindrixRender();
+  updateSindrixOverview();
+};
+
+/* Show statistics immediately */
+updateSindrixOverview();
+
   
 </script>
 </body>
