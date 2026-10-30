@@ -3177,15 +3177,39 @@ $('form').onsubmit=e=>{
 $('cancel').onclick=reset;
 $('filter').oninput=render;
 
+
 function say(t){
-  $('answer').textContent=t;
-  if(voiceOn&&'speechSynthesis'in window){
+  $('answer').textContent = t;
+
+  if (voiceOn && 'speechSynthesis' in window) {
     speechSynthesis.cancel();
-    const utter=new SpeechSynthesisUtterance(t);
-    utter.lang='en-IN';
+
+    const utter = new SpeechSynthesisUtterance(t);
+
+    // SINDRIX — DEEP BRITISH AI VOICE
+    const voices = speechSynthesis.getVoices();
+
+    const britishVoices = voices.filter(v =>
+      v.lang.toLowerCase().replace('_', '-') === 'en-gb'
+    );
+
+    const selectedVoice = britishVoices.find(v =>
+      /male|daniel|george|ryan|oliver|arthur/i.test(v.name)
+    ) || britishVoices[0];
+
+    if (selectedVoice) {
+      utter.voice = selectedVoice;
+    }
+
+    utter.lang = selectedVoice?.lang || 'en-GB';
+    utter.rate = 0.83;
+    utter.pitch = 0.72;
+    utter.volume = 1;
+
     speechSynthesis.speak(utter);
   }
 }
+
 
 function ask(t){
   const q=t.toLowerCase().trim();
