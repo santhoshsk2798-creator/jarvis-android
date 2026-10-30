@@ -496,6 +496,69 @@ if('serviceWorker'in navigator&&location.protocol.startsWith('http')){
 
 load();
 render();
+  
+/* SINDRIX INTELLIGENCE ACTIVATION */
+
+function startSindrixAnimation(){
+
+  const screen=document.getElementById('si-startup');
+  const fill=document.getElementById('si-progress-fill');
+  const label=document.getElementById('si-loading-text');
+  const percentage=document.getElementById('si-percentage');
+
+  const reducedMotion=window.matchMedia(
+    '(prefers-reduced-motion: reduce)'
+  ).matches;
+
+  const seen=sessionStorage.getItem('sindrix_intro_seen');
+
+  const duration=reducedMotion ? 400 : seen ? 1800 : 5000;
+
+  const start=performance.now();
+
+  function animate(now){
+
+    const elapsed=now-start;
+    const p=Math.min(100,elapsed/duration*100);
+
+    fill.style.width=p+'%';
+    percentage.textContent=Math.round(p)+'%';
+
+    if(p<20){
+      label.textContent='INITIALIZING SINDRIX...';
+    }
+    else if(p<45){
+      label.textContent='LOADING INTELLIGENCE...';
+    }
+    else if(p<70){
+      label.textContent='ACTIVATING SINDRIX...';
+    }
+    else if(p<95){
+      label.textContent='SINDRIX ONLINE...';
+    }
+    else{
+      label.textContent='WELCOME TO SINDRIX';
+    }
+
+    if(p<100){
+      requestAnimationFrame(animate);
+    }
+    else{
+      sessionStorage.setItem('sindrix_intro_seen','1');
+
+      screen.classList.add('si-finished');
+
+      setTimeout(()=>{
+        screen.remove();
+      },850);
+    }
+  }
+
+  requestAnimationFrame(animate);
+}
+
+startSindrixAnimation();
+
 </script>
 </body>
 </html>
