@@ -1141,6 +1141,95 @@ main > p.muted{
 }
 
 
+
+  
+/* =====================================
+   SINDRIX SMART COMMAND SUGGESTIONS
+   STEP 9B — PREMIUM DESIGN
+   ===================================== */
+
+.sd-suggestions{
+ margin-top:22px;
+ margin-bottom:20px;
+ padding:18px;
+ border:1px solid #204c6e;
+ border-radius:15px;
+ background:linear-gradient(145deg,#081c30,#040d19);
+}
+
+.sd-suggestions-title{
+ display:flex;
+ align-items:center;
+ gap:10px;
+ margin-bottom:15px;
+ color:#f3c779;
+ font-size:13px;
+ letter-spacing:.5px;
+}
+
+.sd-suggestions-title span{
+ color:#60d5ff;
+ font-size:22px;
+ text-shadow:0 0 15px #008cff;
+}
+
+.sd-suggestions-grid{
+ display:grid;
+ grid-template-columns:repeat(2,minmax(0,1fr));
+ gap:10px;
+}
+
+main .sd-suggestion{
+ width:100%;
+ min-height:48px;
+ padding:12px 14px;
+ text-align:left;
+ background:linear-gradient(135deg,#102b45,#081728);
+ border:1px solid #276487;
+ border-radius:11px;
+ color:#d9edff;
+ font-size:12px;
+ font-weight:500;
+ box-shadow:inset 0 1px 0 #ffffff0a;
+ transition:
+  transform .2s ease,
+  border-color .2s ease,
+  box-shadow .2s ease;
+}
+
+main .sd-suggestion:hover{
+ transform:translateY(-2px);
+ border-color:#f3c779;
+ box-shadow:0 0 18px #dba64c22;
+ color:#ffe0a6;
+}
+
+main .sd-suggestion:focus-visible{
+ outline:2px solid #f3c779;
+ outline-offset:3px;
+}
+
+@media(max-width:480px){
+ .sd-suggestions{
+  padding:13px;
+ }
+
+ .sd-suggestions-grid{
+  grid-template-columns:1fr;
+ }
+
+ main .sd-suggestion{
+  min-height:46px;
+  font-size:13px;
+ }
+}
+
+@media(prefers-reduced-motion:reduce){
+ main .sd-suggestion{
+  transition:none;
+ }
+}
+
   
 </style>
 </head>
