@@ -11623,5 +11623,49 @@ console.info(
 })(); // Close the IIFE opened in Part 11
 
 </script>
+  
+<script>
+(function () {
+  "use strict";
+
+  function rescueSindrix() {
+    const startup = document.getElementById("si-startup");
+
+    const progress = document.getElementById("si-progress-fill");
+    const percentage = document.getElementById("si-percentage");
+    const loadingText = document.getElementById("si-loading-text");
+
+    if (progress) progress.style.width = "100%";
+    if (percentage) percentage.textContent = "100%";
+
+    if (loadingText) {
+      loadingText.textContent = "OPENING SINDRIX";
+    }
+
+    setTimeout(function () {
+      if (startup) {
+        startup.style.display = "none";
+        startup.setAttribute("aria-hidden", "true");
+      }
+
+      const home = document.getElementById("sd-page-home");
+
+      if (home) {
+        document.querySelectorAll(".sd-page").forEach(function (page) {
+          page.classList.remove("sd-page-active");
+        });
+
+        home.classList.add("sd-page-active");
+      }
+    }, 500);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", rescueSindrix);
+  } else {
+    rescueSindrix();
+  }
+})();
+</script>
 </body>
 </html>
