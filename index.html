@@ -3073,6 +3073,7 @@ function load(){
 function save(){
   localStorage.setItem(KEY,JSON.stringify(apps));
   render();
+    document.dispatchEvent(new Event('sindrix:career-updated'));
 }
 
 function clean(v){
@@ -3559,6 +3560,7 @@ document.querySelectorAll('.sd-suggestion').forEach(button => {
   function saveTasks() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+      document.dispatchEvent(new Event('sindrix:tasks-updated'));
       return true;
     } catch (error) {
       console.error('Could not save SINDRIX tasks:', error);
@@ -4511,7 +4513,26 @@ try {
 
     // Interview integration will use the existing
     // job-application data structure in the next part.
-    if (interviewElement) interviewElement.textContent = '—';
+    
+    // STEP 14D-2 — UPCOMING CAREER INTERVIEWS
+    const applications = readSaved('jarvis_apps_v1');
+
+    const upcomingInterviews = applications.filter(application => {
+      if (!application.interview) return false;
+
+      const interviewDate = String(application.interview);
+      const status = String(application.status || '').toLowerCase();
+
+      return interviewDate >= today &&
+        /^\d{4}-\d{2}-\d{2}$/.test(interviewDate) &&
+        status !== 'rejected' &&
+        status !== 'withdrawn';
+    }).length;
+
+    if (interviewElement) {
+      interviewElement.textContent = upcomingInterviews;
+    }
+
 
     if (summaryElement) {
       summaryElement.textContent =
@@ -4532,6 +4553,12 @@ try {
     'sindrix:tasks-updated',
     updateBriefing
   );
+  
+  document.addEventListener(
+    'sindrix:career-updated',
+    updateBriefing
+  );
+
 
   window.addEventListener('focus', updateBriefing);
   window.addEventListener('pageshow', updateBriefing);
