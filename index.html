@@ -1500,7 +1500,98 @@ main .sd-suggestion:focus-visible{
 <div id="applications"></div>
 </section>
 
-<section class="card">
+
+<!-- SINDRIX PERSONAL PLANNER -->
+<section class="sd-planner" id="sd-planner">
+
+  <div class="sd-section-heading">
+    <div>
+      <span class="sd-overline">
+        SINDRIX PRODUCTIVITY SYSTEM
+      </span>
+      <h2>Personal Planner</h2>
+    </div>
+    <span class="sd-section-note">
+      Santhosh ♡ Indhu
+    </span>
+  </div>
+
+  <div class="sd-planner-stats">
+    <div class="sd-planner-stat">
+      <strong id="sd-task-total">0</strong>
+      <small>Total Tasks</small>
+    </div>
+
+    <div class="sd-planner-stat">
+      <strong id="sd-task-pending">0</strong>
+      <small>Pending</small>
+    </div>
+
+    <div class="sd-planner-stat">
+      <strong id="sd-task-completed">0</strong>
+      <small>Completed</small>
+    </div>
+  </div>
+
+  <div class="sd-planner-entry">
+    <h3>Add a New Task</h3>
+
+    <form id="sd-task-form">
+
+      <input
+        id="sd-task-name"
+        type="text"
+        maxlength="150"
+        placeholder="What needs to be done?"
+        aria-label="Task name"
+        required
+      >
+
+      <select id="sd-task-owner" aria-label="Task owner">
+        <option value="Santhosh">Santhosh</option>
+        <option value="Indhu">Indhu</option>
+        <option value="Together">Together ♡</option>
+      </select>
+
+      <select id="sd-task-category" aria-label="Task category">
+        <option value="Personal">Personal</option>
+        <option value="Career">Career</option>
+        <option value="Family">Family</option>
+        <option value="Project">Project</option>
+      </select>
+
+      <label for="sd-task-date">
+        Due date (optional)
+      </label>
+      <input id="sd-task-date" type="date">
+
+      <button type="submit" class="sd-task-add">
+        + Add Task
+      </button>
+
+    </form>
+  </div>
+
+  <div class="sd-planner-list">
+    <h3>Our Tasks</h3>
+
+    <div id="sd-task-list">
+      <p class="muted">
+        Your tasks will appear here.
+      </p>
+    </div>
+  </div>
+
+  <p class="sd-planner-note">
+    Tasks are saved in this browser only.
+    Shared synchronization is not connected yet.
+  </p>
+
+</section>
+<!-- END SINDRIX PERSONAL PLANNER -->
+
+  
+  <section class="card">
 <h2 id="formtitle">Add application</h2>
 <form id="form">
 <input id="company" required maxlength="100" placeholder="Company (e.g. IBM)">
