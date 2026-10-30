@@ -3555,6 +3555,61 @@ document.querySelectorAll('.sd-suggestion').forEach(button => {
       });
     });
 
+
+    
+/* STEP 13A — SPECIAL MOMENTS CALENDAR CONNECTION */
+
+try {
+  const savedMoments = JSON.parse(
+    localStorage.getItem('sindrix_special_moments_v1') || '[]'
+  );
+
+  if (Array.isArray(savedMoments)) {
+    const calendarYear = displayedMonth.getFullYear();
+
+    savedMoments.forEach(moment => {
+      if (!moment.name || !moment.date) return;
+
+      const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(moment.date);
+      if (!match) return;
+
+      const originalYear = Number(match[1]);
+      const month = Number(match[2]);
+      const day = Number(match[3]);
+
+      const eventYear = moment.repeat
+        ? calendarYear
+        : originalYear;
+
+      const eventDate = new Date(eventYear, month - 1, day);
+
+      // Ignore invalid dates, such as February 29 in non-leap years.
+      if (
+        eventDate.getFullYear() !== eventYear ||
+        eventDate.getMonth() !== month - 1 ||
+        eventDate.getDate() !== day
+      ) return;
+
+      const dateString =
+        eventYear + '-' +
+        String(month).padStart(2, '0') + '-' +
+        String(day).padStart(2, '0');
+
+      events.push({
+        date: dateString,
+        title: '♡ ' + moment.name,
+        detail: (moment.type || 'Special Moment') +
+          (moment.repeat ? ' · Every year' : ''),
+        type: 'moment'
+      });
+    });
+  }
+} catch (error) {
+  console.warn('Unable to load special moments:', error);
+}
+
+    /* END STEP 13A */
+
     return events.sort((a, b) => a.date.localeCompare(b.date));
   }
 
