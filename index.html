@@ -1435,6 +1435,41 @@ document.querySelectorAll('.sd-nav').forEach(btn=>{
 });
 
 
+/* SINDRIX QUICK ACTION BUTTONS */
+
+document.querySelectorAll('[data-sd-action]').forEach(card => {
+
+  card.addEventListener('click', () => {
+
+    const action = card.dataset.sdAction;
+
+    if (action === 'career') {
+      document.getElementById('stats')
+        ?.scrollIntoView({behavior:'smooth',block:'center'});
+    }
+
+    if (action === 'chat') {
+      document.getElementById('command')
+        ?.scrollIntoView({behavior:'smooth',block:'center'});
+
+      document.getElementById('command')?.focus();
+    }
+
+    if (action === 'voice') {
+      document.getElementById('listen')?.click();
+    }
+
+    if (action === 'backup') {
+      document.getElementById('export')
+        ?.scrollIntoView({behavior:'smooth',block:'center'});
+    }
+
+  });
+
+});
+
+
+  
 </script>
 </body>
 </html>
