@@ -29,6 +29,139 @@ button.danger{background:#5e2739;color:white}
 small{color:#a2bed0}
 #answer{min-height:50px;white-space:pre-wrap}
 .hidden{display:none}
+  
+/* SINDRIX GOLDEN SI STARTUP */
+.si-startup{
+ position:fixed;
+ inset:0;
+ z-index:9999;
+ display:flex;
+ flex-direction:column;
+ align-items:center;
+ justify-content:center;
+ text-align:center;
+ overflow:hidden;
+ background:radial-gradient(circle at center,
+ #103d70 0%,#04172e 42%,#01040a 85%);
+ transition:opacity .8s ease,visibility .8s;
+}
+.si-startup.si-finished{
+ opacity:0;
+ visibility:hidden;
+ pointer-events:none;
+}
+.si-stars{
+ position:absolute;
+ inset:0;
+ opacity:.5;
+ background-image:
+ radial-gradient(2px 2px at 20% 30%,white 95%,transparent),
+ radial-gradient(1px 1px at 70% 60%,#5acfff 95%,transparent),
+ radial-gradient(1px 1px at 40% 80%,#f7d28b 95%,transparent);
+ background-size:190px 210px;
+ animation:si-twinkle 3s ease-in-out infinite alternate;
+}
+.si-reactor{
+ width:240px;
+ height:240px;
+ position:relative;
+ display:grid;
+ place-items:center;
+ filter:drop-shadow(0 0 25px #087bff);
+ animation:si-appear 1s ease-out both;
+}
+.si-ring{
+ position:absolute;
+ border-radius:50%;
+ border:2px solid #24baff;
+ box-shadow:0 0 18px #078cff,inset 0 0 14px #0066cc;
+}
+.si-ring-one{
+ inset:0;
+ border-style:dashed;
+ animation:si-rotate 6s linear infinite;
+}
+.si-ring-two{
+ inset:20px;
+ border-color:#f3c774;
+ animation:si-rotate 4s linear infinite reverse;
+}
+.si-ring-three{
+ inset:39px;
+ border-style:dotted;
+ animation:si-rotate 3s linear infinite;
+}
+.si-logo{
+ z-index:1;
+ font:86px Georgia,serif;
+ color:#ffda91;
+ text-shadow:0 0 25px #ffad37;
+ animation:si-pulse 2s ease-in-out infinite;
+}
+.si-heart{
+ position:absolute;
+ top:148px;
+ z-index:2;
+ color:#ffd18a;
+ font-size:24px;
+ text-shadow:0 0 15px #ffac37;
+}
+.si-name{
+ margin:30px 0 10px;
+ color:#f4ce89;
+ font:32px Georgia,serif;
+ letter-spacing:8px;
+}
+.si-tagline{
+ padding:0 20px;
+ color:#d5e9ff;
+ font-size:11px;
+ letter-spacing:1px;
+}
+#si-loading-text{
+ margin-top:38px;
+ color:#70d4ff;
+ font-size:12px;
+ letter-spacing:2px;
+}
+.si-progress-track{
+ width:230px;
+ height:5px;
+ margin-top:14px;
+ border:1px solid #c99d56;
+ border-radius:10px;
+ background:#071a30;
+ overflow:hidden;
+}
+#si-progress-fill{
+ width:0;
+ height:100%;
+ background:linear-gradient(90deg,#006aff,#67e6ff);
+ box-shadow:0 0 12px #35bfff;
+}
+#si-percentage{
+ color:#a8c8e8;
+ font-size:12px;
+}
+@keyframes si-rotate{
+ to{transform:rotate(360deg)}
+}
+@keyframes si-pulse{
+ 50%{transform:scale(1.08);filter:brightness(1.4)}
+}
+@keyframes si-appear{
+ from{opacity:0;transform:scale(.4)}
+ to{opacity:1;transform:scale(1)}
+}
+@keyframes si-twinkle{
+ to{opacity:.9}
+}
+@media(prefers-reduced-motion:reduce){
+ .si-ring,.si-logo,.si-reactor,.si-stars{
+  animation:none;
+ }
+}
+
 </style>
 </head>
 <body>
