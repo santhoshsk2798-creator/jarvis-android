@@ -2981,6 +2981,312 @@ document.querySelectorAll('.sd-suggestion').forEach(button => {
 
 })();
 
+
+/* =========================================
+   SINDRIX SMART CALENDAR
+   STEP 11C — FUNCTIONAL CALENDAR
+   Santhosh ♥ Indhu
+   ========================================= */
+
+(function initSindrixCalendar() {
+
+  const grid = document.getElementById('sd-calendar-days');
+  const monthTitle = document.getElementById('sd-calendar-month');
+  const previous = document.getElementById('sd-calendar-prev');
+  const next = document.getElementById('sd-calendar-next');
+  const eventList = document.getElementById('sd-calendar-event-list');
+
+  if (!grid || !monthTitle || !previous || !next || !eventList) {
+    return;
+  }
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  let displayedMonth = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    1
+  );
+
+  let selectedDate = formatDate(today);
+
+  function formatDate(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+  }
+
+  function normalizeDate(value) {
+    if (typeof value !== 'string') return '';
+
+    const match = value.match(/^(\d{4}-\d{2}-\d{2})/);
+    return match ? match[1] : '';
+  }
+
+  function getPlannerTasks() {
+    try {
+      const saved = JSON.parse(
+        localStorage.getItem('sindrix_personal_tasks_v1') || '[]'
+      );
+
+      return Array.isArray(saved) ? saved : [];
+    } catch (error) {
+      console.warn('Calendar could not read planner tasks:', error);
+      return [];
+    }
+  }
+
+  function getCareerApplications() {
+    // Use the existing SINDRIX applications array when available.
+    if (typeof apps !== 'undefined' && Array.isArray(apps)) {
+      return apps;
+    }
+
+    try {
+      const saved = JSON.parse(
+        localStorage.getItem('jarvis_apps_v1') || '[]'
+      );
+
+      return Array.isArray(saved) ? saved : [];
+    } catch (error) {
+      console.warn('Calendar could not read applications:', error);
+      return [];
+    }
+  }
+
+  function getEvents() {
+    const events = [];
+
+    getPlannerTasks().forEach(task => {
+      const date = normalizeDate(task.date);
+
+      if (!date) return;
+
+      events.push({
+        date: date,
+        title: String(task.name || 'Untitled task'),
+        detail:
+          String(task.owner || 'Personal') +
+          ' · ' +
+          String(task.category || 'Task') +
+          (task.completed ? ' · Completed' : ''),
+        type: 'task'
+      });
+    });
+
+    getCareerApplications().forEach(application => {
+      const date = normalizeDate(application.interview);
+
+      if (!date) return;
+
+      events.push({
+        date: date,
+        title: 'Interview · ' +
+          String(application.company || 'Company'),
+        detail: String(application.role || 'Job interview'),
+        type: 'interview'
+      });
+    });
+
+    return events.sort((a, b) => a.date.localeCompare(b.date));
+  }
+
+  function createEventRow(event) {
+    const row = document.createElement('div');
+    row.className = 'sd-calendar-event';
+
+    const dateBox = document.createElement('div');
+    dateBox.className = 'sd-calendar-event-date';
+
+    const dateNumber = Number(event.date.slice(8, 10));
+    const monthNumber = Number(event.date.slice(5, 7)) - 1;
+
+    const monthName = new Date(2026, monthNumber, 1)
+      .toLocaleDateString('en-IN', { month: 'short' });
+
+    dateBox.textContent = `${dateNumber} ${monthName}`;
+
+    const details = document.createElement('div');
+    details.className = 'sd-calendar-event-details';
+
+    const title = document.createElement('strong');
+    title.textContent = event.title;
+
+    const description = document.createElement('small');
+    description.textContent = event.detail;
+
+    details.append(title, description);
+    row.append(dateBox, details);
+
+    return row;
+  }
+
+  function showEvents(dateString) {
+    eventList.replaceChildren();
+
+    const events = getEvents();
+    const selectedEvents = events.filter(
+      event => event.date === dateString
+    );
+
+    const heading = document.createElement('p');
+    heading.className = 'sd-calendar-empty';
+
+    heading.textContent = new Date(
+      dateString + 'T12:00:00'
+    ).toLocaleDateString('en-IN', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
+
+    heading.style.marginBottom = '12px';
+    eventList.appendChild(heading);
+
+    if (selectedEvents.length === 0) {
+      const empty = document.createElement('p');
+      empty.className = 'sd-calendar-empty';
+      empty.textContent = 'No events scheduled for this date.';
+      eventList.appendChild(empty);
+      return;
+    }
+
+    selectedEvents.forEach(event => {
+      eventList.appendChild(createEventRow(event));
+    });
+  }
+
+  function renderCalendar() {
+    grid.replaceChildren();
+
+    const year = displayedMonth.getFullYear();
+    const month = displayedMonth.getMonth();
+
+    monthTitle.textContent = displayedMonth.toLocaleDateString(
+      'en-IN',
+      { month: 'long', year: 'numeric' }
+    );
+
+    const firstWeekday = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    const eventDates = new Set(
+      getEvents().map(event => event.date)
+    );
+
+    // Blank spaces before the first day of the month
+    for (let i = 0; i < firstWeekday; i++) {
+      const blank = document.createElement('span');
+      blank.className = 'sd-calendar-day is-outside';
+      blank.setAttribute('aria-hidden', 'true');
+      grid.appendChild(blank);
+    }
+
+    for (let day = 1; day <= daysInMonth; day++) {
+      const date = new Date(year, month, day);
+      const dateString = formatDate(date);
+
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'sd-calendar-day';
+      button.textContent = day;
+
+      button.setAttribute(
+        'aria-label',
+        date.toLocaleDateString('en-IN', {
+          weekday: 'long',
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric'
+        })
+      );
+
+      if (dateString === formatDate(today)) {
+        button.classList.add('is-today');
+      }
+
+      if (dateString === selectedDate) {
+        button.classList.add('is-selected');
+        button.setAttribute('aria-pressed', 'true');
+      } else {
+        button.setAttribute('aria-pressed', 'false');
+      }
+
+      if (eventDates.has(dateString)) {
+        const dot = document.createElement('span');
+        dot.className = 'sd-calendar-dot';
+        dot.setAttribute('aria-hidden', 'true');
+        button.appendChild(dot);
+      }
+
+      button.addEventListener('click', () => {
+        selectedDate = dateString;
+        renderCalendar();
+        showEvents(selectedDate);
+      });
+
+      grid.appendChild(button);
+    }
+
+    // Complete the final week with empty spaces
+    const totalCells = firstWeekday + daysInMonth;
+    const remaining = (7 - (totalCells % 7)) % 7;
+
+    for (let i = 0; i < remaining; i++) {
+      const blank = document.createElement('span');
+      blank.className = 'sd-calendar-day is-outside';
+      blank.setAttribute('aria-hidden', 'true');
+      grid.appendChild(blank);
+    }
+  }
+
+  function changeMonth(amount) {
+    displayedMonth = new Date(
+      displayedMonth.getFullYear(),
+      displayedMonth.getMonth() + amount,
+      1
+    );
+
+    selectedDate = formatDate(displayedMonth);
+
+    renderCalendar();
+    showEvents(selectedDate);
+  }
+
+  previous.addEventListener('click', () => changeMonth(-1));
+  next.addEventListener('click', () => changeMonth(1));
+
+  // Refresh the calendar when a task is added,
+  // completed, or deleted.
+  const planner = document.getElementById('sd-planner');
+
+  if (planner) {
+    planner.addEventListener('submit', () => {
+      setTimeout(renderCalendar, 0);
+      setTimeout(() => showEvents(selectedDate), 0);
+    });
+
+    planner.addEventListener('click', () => {
+      setTimeout(renderCalendar, 0);
+      setTimeout(() => showEvents(selectedDate), 0);
+    });
+
+    planner.addEventListener('change', () => {
+      setTimeout(renderCalendar, 0);
+      setTimeout(() => showEvents(selectedDate), 0);
+    });
+  }
+
+  renderCalendar();
+  showEvents(selectedDate);
+
+})();
+
+  
   
 </script>
 </body>
