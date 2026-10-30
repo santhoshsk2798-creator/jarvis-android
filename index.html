@@ -3765,12 +3765,31 @@ try {
         button.setAttribute('aria-pressed', 'false');
       }
 
-      if (eventDates.has(dateString)) {
+   
+      const dayEvents = getEvents().filter(
+        event => event.date === dateString
+      );
+
+      const hasMoment = dayEvents.some(
+        event => event.type === 'moment'
+      );
+
+      if (hasMoment) {
+        button.classList.add('has-moment');
+
+        const heart = document.createElement('span');
+        heart.className = 'sd-calendar-heart';
+        heart.textContent = '♥';
+        heart.setAttribute('aria-hidden', 'true');
+        button.appendChild(heart);
+
+      } else if (eventDates.has(dateString)) {
         const dot = document.createElement('span');
         dot.className = 'sd-calendar-dot';
         dot.setAttribute('aria-hidden', 'true');
         button.appendChild(dot);
       }
+
 
       button.addEventListener('click', () => {
         selectedDate = dateString;
