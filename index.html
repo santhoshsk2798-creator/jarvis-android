@@ -1,3 +1,336 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#071321"><link rel="manifest" href="manifest.webmanifest"><title>JARVIS Career Assistant</title><style>*{box-sizing:border-box}body{margin:0;background:#071321;color:#e9f6ff;font:15px system-ui,Arial}main{max-width:680px;margin:auto;padding:18px}.hero{text-align:center;padding:22px 0}.orb{margin:12px auto;width:110px;height:110px;border:3px solid #27c8f5;border-radius:50%;box-shadow:0 0 28px #118ec3,inset 0 0 30px #095d83;display:grid;place-items:center;font-size:45px;color:#6ce3ff}.muted{color:#92b3c7}h1{letter-spacing:5px;margin:0}h2{font-size:18px}.card{background:#102338;border:1px solid #24516a;border-radius:14px;padding:15px;margin:12px 0}input,select,button,textarea{font:inherit;border-radius:9px;padding:11px;border:1px solid #346078}input,select,textarea{width:100%;background:#091a2a;color:white;margin:5px 0 11px}button{background:#0da7d5;color:#04111d;font-weight:700;cursor:pointer}button.secondary{background:#1a3850;color:#e5f8ff}button.danger{background:#5e2739;color:white}.actions{display:flex;gap:7px;flex-wrap:wrap}.actions button{flex:1}.item{padding:12px 0;border-top:1px solid #24465b}.pill{display:inline-block;background:#164861;color:#9eeaff;border-radius:20px;padding:3px 9px;font-size:12px}small{color:#a2bed0}#answer{min-height:50px;white-space:pre-wrap}.hidden{display:none}</style></head><body><main><header class="hero"><h1>J.A.R.V.I.S.</h1><div class="orb">◉</div><div class="muted">PERSONAL CAREER ASSISTANT · V1</div></header><section class="card"><h2>Ask JARVIS</h2><input id="command" placeholder="e.g. Show my IBM status" aria-label="Command"><div class="actions"><button id="ask">Ask</button><button id="listen" class="secondary">🎙 Speak</button><button id="talk" class="secondary">🔊 Voice: On</button></div><p id="answer" role="status" aria-live="polite">Ready. Add your applications below.</p></section><section class="card"><h2>Application dashboard</h2><p id="stats" class="muted"></p><input id="filter" placeholder="Search company or role"><div id="applications"></div></section><section class="card"><h2 id="formtitle">Add application</h2><form id="form"><input id="company" required maxlength="100" placeholder="Company (e.g. IBM)"><input id="role" maxlength="150" placeholder="Role (e.g. AWS Data Engineer)"><select id="status"><option>Applied</option><option>Assessment</option><option>Interview</option><option>Offer</option><option>Rejected</option><option>Withdrawn</option></select><label for="date">Application date</label><input id="date" type="date"><label for="interview">Interview date (optional)</label><input id="interview" type="date"><input id="link" type="url" placeholder="Job portal link (optional)"><textarea id="notes" rows="3" placeholder="Notes, recruiter details, next steps"></textarea><div class="actions"><button type="submit">Save application</button><button type="button" id="cancel" class="secondary hidden">Cancel edit</button></div></form></section><section class="card"><h2>Backup your data</h2><div class="actions"><button id="export" class="secondary">Export JSON</button><button id="importbtn" class="secondary">Import JSON</button><input id="file" type="file" accept="application/json,.json" class="hidden"></div><p><small>Data is saved in this browser on this device. Export a backup regularly. Clearing browser storage can erase records.</small></p></section><p class="muted">Privacy: no accounts connected; no email is read; no application data is sent to an AI service. Voice recognition may use your browser's speech service.</p></main><script>
-const KEY='jarvis_apps_v1';let apps=[];let editing=null;let voiceOn=true;const $=id=>document.getElementById(id);function load(){try{const v=JSON.parse(localStorage.getItem(KEY)||'[]');apps=Array.isArray(v)?v:[]}catch{apps=[]}}function save(){localStorage.setItem(KEY,JSON.stringify(apps));render()}function clean(v){return String(v??'')}function el(tag,txt){const n=document.createElement(tag);n.textContent=clean(txt);return n}function render(){const q=$('filter').value.trim().toLowerCase();$('stats').textContent=`${apps.length} applications · ${apps.filter(a=>a.status==='Interview').length} interviews · ${apps.filter(a=>a.status==='Offer').length} offers`;$('applications').replaceChildren();const shown=apps.filter(a=>(a.company+' '+a.role).toLowerCase().includes(q));if(!shown.length)$('applications').append(el('p','No matching applications yet.'));shown.forEach(a=>{const div=el('div','');div.className='item';const title=el('strong',a.company+' — '+(a.role||'Role not specified'));div.append(title,el('p',a.status+' · Applied: '+(a.date||'Not specified')));if(a.interview)div.append(el('small','Interview: '+a.interview));if(a.notes)div.append(el('p',a.notes));if(a.link){try{const u=new URL(a.link);if(['https:','http:'].includes(u.protocol)){const link=el('a','Open job link');link.href=u.href;link.target='_blank';link.rel='noopener noreferrer';link.style.color='#8ceaff';div.append(link)}}catch{}}const buttons=el('div','');buttons.className='actions';const edit=el('button','Edit');edit.className='secondary';edit.onclick=()=>{editing=a.id;['company','role','status','date','interview','link','notes'].forEach(k=>$(k).value=a[k]||'');$('formtitle').textContent='Edit application';$('cancel').classList.remove('hidden');$('form').scrollIntoView({behavior:'smooth'})};const del=el('button','Delete');del.className='danger';del.onclick=()=>{if(confirm('Delete '+a.company+'?')){apps=apps.filter(x=>x.id!==a.id);save()}};buttons.append(edit,del);div.append(buttons);$('applications').append(div)})}function reset(){editing=null;$('form').reset();$('formtitle').textContent='Add application';$('cancel').classList.add('hidden')}$('form').onsubmit=e=>{e.preventDefault();const obj={id:editing||crypto.randomUUID(),company:$('company').value.trim(),role:$('role').value.trim(),status:$('status').value,date:$('date').value,interview:$('interview').value,link:$('link').value.trim(),notes:$('notes').value.trim()};if(!obj.company)return;if(editing)apps=apps.map(a=>a.id===editing?obj:a);else apps.unshift(obj);save();reset();say('Application saved for '+obj.company)};$('cancel').onclick=reset;$('filter').oninput=render;function say(t){$('answer').textContent=t;if(voiceOn&&'speechSynthesis'in window){speechSynthesis.cancel();const utter=new SpeechSynthesisUtterance(t);utter.lang='en-IN';speechSynthesis.speak(utter)}}function ask(t){const q=t.toLowerCase().trim();if(!q)return say('Please enter a command.');if(q.includes('how many')||q.includes('summary')||q.includes('all application'))return say(`You have ${apps.length} applications, ${apps.filter(a=>a.status==='Interview').length} interviews, and ${apps.filter(a=>a.status==='Offer').length} offers.`);if(q.includes('interview')){const list=apps.filter(a=>a.status==='Interview'||a.interview);return say(list.length?list.map(a=>`${a.company}: ${a.status}${a.interview?' on '+a.interview:''}`).join('. '):'No interviews recorded yet.')}const hits=apps.filter(a=>q.includes(a.company.toLowerCase())||a.company.toLowerCase().includes(q.replace(/^(show|check|what is|status of|my|application|status|for|jarvis|please)\s*/g,'').trim()));if(hits.length)return say(hits.map(a=>`${a.company}: ${a.status}. ${a.role||''}. ${a.notes||''}`).join('\n'));say('I cannot find that application. Add it below, or ask for your application summary. Live company portals are not connected.')}$('ask').onclick=()=>ask($('command').value);$('command').onkeydown=e=>{if(e.key==='Enter')ask($('command').value)};$('talk').onclick=()=>{voiceOn=!voiceOn;$('talk').textContent='🔊 Voice: '+(voiceOn?'On':'Off');if(!voiceOn&&'speechSynthesis'in window)speechSynthesis.cancel()};$('listen').onclick=()=>{const R=window.SpeechRecognition||window.webkitSpeechRecognition;if(!R)return say('Voice recognition is not supported in this browser. Type your command instead.');const r=new R();r.lang='en-IN';r.onresult=e=>{$('command').value=e.results[0][0].transcript;ask($('command').value)};r.onerror=e=>{$('answer').textContent='Microphone error: '+e.error};r.start()};$('export').onclick=()=>{const blob=new Blob([JSON.stringify(apps,null,2)],{type:'application/json'});const u=URL.createObjectURL(blob);const a=document.createElement('a');a.href=u;a.download='jarvis-applications-backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(u),1000)};$('importbtn').onclick=()=>$('file').click();$('file').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const d=JSON.parse(await f.text());if(!Array.isArray(d)||!d.every(a=>a&&typeof a.company==='string'&&typeof a.id==='string'))throw Error('Invalid backup');if(confirm('Replace current applications with this backup?')){apps=d.map(a=>({id:clean(a.id),company:clean(a.company),role:clean(a.role),status:clean(a.status),date:clean(a.date),interview:clean(a.interview),link:clean(a.link),notes:clean(a.notes)}));save()}}catch(err){alert('Import failed: '+err.message)}e.target.value=''};if('serviceWorker'in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});load();render();
-</script></body></html>
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#071321">
+<link rel="manifest" href="manifest.webmanifest">
+<title>SINDRIX Personal AI Assistant</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#071321;color:#e9f6ff;font:15px system-ui,Arial}
+main{max-width:680px;margin:auto;padding:18px}
+.hero{text-align:center;padding:22px 0}
+.orb{margin:12px auto;width:110px;height:110px;border:3px solid #27c8f5;border-radius:50%;box-shadow:0 0 28px #118ec3,inset 0 0 30px #095d83;display:grid;place-items:center;font-size:45px;color:#6ce3ff}
+.muted{color:#92b3c7}
+h1{letter-spacing:5px;margin:0}
+h2{font-size:18px}
+.card{background:#102338;border:1px solid #24516a;border-radius:14px;padding:15px;margin:12px 0}
+input,select,button,textarea{font:inherit;border-radius:9px;padding:11px;border:1px solid #346078}
+input,select,textarea{width:100%;background:#091a2a;color:white;margin:5px 0 11px}
+button{background:#0da7d5;color:#04111d;font-weight:700;cursor:pointer}
+button.secondary{background:#1a3850;color:#e5f8ff}
+button.danger{background:#5e2739;color:white}
+.actions{display:flex;gap:7px;flex-wrap:wrap}
+.actions button{flex:1}
+.item{padding:12px 0;border-top:1px solid #24465b}
+.pill{display:inline-block;background:#164861;color:#9eeaff;border-radius:20px;padding:3px 9px;font-size:12px}
+small{color:#a2bed0}
+#answer{min-height:50px;white-space:pre-wrap}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<main>
+<header class="hero">
+<h1>SINDRIX</h1>
+<div class="orb">◉</div>
+<div class="muted">SANTHOSH &amp; INDHU'S PERSONAL AI ASSISTANT</div>
+</header>
+
+<section class="card">
+<h2>Ask SINDRIX</h2>
+<input id="command" placeholder="e.g. Show my IBM status" aria-label="Command">
+<div class="actions">
+<button id="ask">Ask</button>
+<button id="listen" class="secondary">🎙 Speak</button>
+<button id="talk" class="secondary">🔊 Voice: On</button>
+</div>
+<p id="answer" role="status" aria-live="polite">SINDRIX is ready. Add your applications below.</p>
+</section>
+
+<section class="card">
+<h2>Application dashboard</h2>
+<p id="stats" class="muted"></p>
+<input id="filter" placeholder="Search company or role">
+<div id="applications"></div>
+</section>
+
+<section class="card">
+<h2 id="formtitle">Add application</h2>
+<form id="form">
+<input id="company" required maxlength="100" placeholder="Company (e.g. IBM)">
+<input id="role" maxlength="150" placeholder="Role (e.g. AWS Data Engineer)">
+<select id="status">
+<option>Applied</option>
+<option>Assessment</option>
+<option>Interview</option>
+<option>Offer</option>
+<option>Rejected</option>
+<option>Withdrawn</option>
+</select>
+<label for="date">Application date</label>
+<input id="date" type="date">
+<label for="interview">Interview date (optional)</label>
+<input id="interview" type="date">
+<input id="link" type="url" placeholder="Job portal link (optional)">
+<textarea id="notes" rows="3" placeholder="Notes, recruiter details, next steps"></textarea>
+<div class="actions">
+<button type="submit">Save application</button>
+<button type="button" id="cancel" class="secondary hidden">Cancel edit</button>
+</div>
+</form>
+</section>
+
+<section class="card">
+<h2>Backup your data</h2>
+<div class="actions">
+<button id="export" class="secondary">Export JSON</button>
+<button id="importbtn" class="secondary">Import JSON</button>
+<input id="file" type="file" accept="application/json,.json" class="hidden">
+</div>
+<p><small>Data is saved in this browser on this device. Export a backup regularly. Clearing browser storage can erase records.</small></p>
+</section>
+
+<p class="muted">Privacy: no accounts connected; no email is read; no application data is sent to an AI service. Voice recognition may use your browser's speech service.</p>
+</main>
+
+<script>
+const KEY='jarvis_apps_v1';
+let apps=[];
+let editing=null;
+let voiceOn=true;
+const $=id=>document.getElementById(id);
+
+function load(){
+  try{
+    const v=JSON.parse(localStorage.getItem(KEY)||'[]');
+    apps=Array.isArray(v)?v:[];
+  }catch{
+    apps=[];
+  }
+}
+
+function save(){
+  localStorage.setItem(KEY,JSON.stringify(apps));
+  render();
+}
+
+function clean(v){
+  return String(v??'');
+}
+
+function el(tag,txt){
+  const n=document.createElement(tag);
+  n.textContent=clean(txt);
+  return n;
+}
+
+function render(){
+  const q=$('filter').value.trim().toLowerCase();
+  $('stats').textContent=`${apps.length} applications · ${apps.filter(a=>a.status==='Interview').length} interviews · ${apps.filter(a=>a.status==='Offer').length} offers`;
+  $('applications').replaceChildren();
+
+  const shown=apps.filter(a=>(a.company+' '+a.role).toLowerCase().includes(q));
+  if(!shown.length)$('applications').append(el('p','No matching applications yet.'));
+
+  shown.forEach(a=>{
+    const div=el('div','');
+    div.className='item';
+    const title=el('strong',a.company+' — '+(a.role||'Role not specified'));
+    div.append(title,el('p',a.status+' · Applied: '+(a.date||'Not specified')));
+
+    if(a.interview)div.append(el('small','Interview: '+a.interview));
+    if(a.notes)div.append(el('p',a.notes));
+
+    if(a.link){
+      try{
+        const u=new URL(a.link);
+        if(['https:','http:'].includes(u.protocol)){
+          const link=el('a','Open job link');
+          link.href=u.href;
+          link.target='_blank';
+          link.rel='noopener noreferrer';
+          link.style.color='#8ceaff';
+          div.append(link);
+        }
+      }catch{}
+    }
+
+    const buttons=el('div','');
+    buttons.className='actions';
+
+    const edit=el('button','Edit');
+    edit.className='secondary';
+    edit.onclick=()=>{
+      editing=a.id;
+      ['company','role','status','date','interview','link','notes'].forEach(k=>$(k).value=a[k]||'');
+      $('formtitle').textContent='Edit application';
+      $('cancel').classList.remove('hidden');
+      $('form').scrollIntoView({behavior:'smooth'});
+    };
+
+    const del=el('button','Delete');
+    del.className='danger';
+    del.onclick=()=>{
+      if(confirm('Delete '+a.company+'?')){
+        apps=apps.filter(x=>x.id!==a.id);
+        save();
+      }
+    };
+
+    buttons.append(edit,del);
+    div.append(buttons);
+    $('applications').append(div);
+  });
+}
+
+function reset(){
+  editing=null;
+  $('form').reset();
+  $('formtitle').textContent='Add application';
+  $('cancel').classList.add('hidden');
+}
+
+$('form').onsubmit=e=>{
+  e.preventDefault();
+  const obj={
+    id:editing||crypto.randomUUID(),
+    company:$('company').value.trim(),
+    role:$('role').value.trim(),
+    status:$('status').value,
+    date:$('date').value,
+    interview:$('interview').value,
+    link:$('link').value.trim(),
+    notes:$('notes').value.trim()
+  };
+
+  if(!obj.company)return;
+  if(editing)apps=apps.map(a=>a.id===editing?obj:a);
+  else apps.unshift(obj);
+
+  save();
+  reset();
+  say('Application saved for '+obj.company);
+};
+
+$('cancel').onclick=reset;
+$('filter').oninput=render;
+
+function say(t){
+  $('answer').textContent=t;
+  if(voiceOn&&'speechSynthesis'in window){
+    speechSynthesis.cancel();
+    const utter=new SpeechSynthesisUtterance(t);
+    utter.lang='en-IN';
+    speechSynthesis.speak(utter);
+  }
+}
+
+function ask(t){
+  const q=t.toLowerCase().trim();
+  if(!q)return say('Please enter a command.');
+
+  if(q.includes('how many')||q.includes('summary')||q.includes('all application')){
+    return say(`You have ${apps.length} applications, ${apps.filter(a=>a.status==='Interview').length} interviews, and ${apps.filter(a=>a.status==='Offer').length} offers.`);
+  }
+
+  if(q.includes('interview')){
+    const list=apps.filter(a=>a.status==='Interview'||a.interview);
+    return say(list.length
+      ?list.map(a=>`${a.company}: ${a.status}${a.interview?' on '+a.interview:''}`).join('. ')
+      :'No interviews recorded yet.');
+  }
+
+  const hits=apps.filter(a=>
+    q.includes(a.company.toLowerCase())||
+    a.company.toLowerCase().includes(
+      q.replace(/^(show|check|what is|status of|my|application|status|for|jarvis|sindrix|please)\s*/g,'').trim()
+    )
+  );
+
+  if(hits.length){
+    return say(hits.map(a=>`${a.company}: ${a.status}. ${a.role||''}. ${a.notes||''}`).join('\n'));
+  }
+
+  say('I cannot find that application. Add it below, or ask for your application summary. Live company portals are not connected.');
+}
+
+$('ask').onclick=()=>ask($('command').value);
+$('command').onkeydown=e=>{
+  if(e.key==='Enter')ask($('command').value);
+};
+
+$('talk').onclick=()=>{
+  voiceOn=!voiceOn;
+  $('talk').textContent='🔊 Voice: '+(voiceOn?'On':'Off');
+  if(!voiceOn&&'speechSynthesis'in window)speechSynthesis.cancel();
+};
+
+$('listen').onclick=()=>{
+  const R=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!R)return say('Voice recognition is not supported in this browser. Type your command instead.');
+
+  const r=new R();
+  r.lang='en-IN';
+  r.onresult=e=>{
+    $('command').value=e.results[0][0].transcript;
+    ask($('command').value);
+  };
+  r.onerror=e=>{
+    $('answer').textContent='Microphone error: '+e.error;
+  };
+  r.start();
+};
+
+$('export').onclick=()=>{
+  const blob=new Blob([JSON.stringify(apps,null,2)],{type:'application/json'});
+  const u=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=u;
+  a.download='sindrix-applications-backup.json';
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(u),1000);
+};
+
+$('importbtn').onclick=()=>$('file').click();
+
+$('file').onchange=async e=>{
+  const f=e.target.files[0];
+  if(!f)return;
+
+  try{
+    const d=JSON.parse(await f.text());
+    if(!Array.isArray(d)||!d.every(a=>a&&typeof a.company==='string'&&typeof a.id==='string')){
+      throw Error('Invalid backup');
+    }
+
+    if(confirm('Replace current applications with this backup?')){
+      apps=d.map(a=>({
+        id:clean(a.id),
+        company:clean(a.company),
+        role:clean(a.role),
+        status:clean(a.status),
+        date:clean(a.date),
+        interview:clean(a.interview),
+        link:clean(a.link),
+        notes:clean(a.notes)
+      }));
+      save();
+    }
+  }catch(err){
+    alert('Import failed: '+err.message);
+  }
+  e.target.value='';
+};
+
+if('serviceWorker'in navigator&&location.protocol.startsWith('http')){
+  navigator.serviceWorker.register('./sw.js').catch(()=>{});
+}
+
+load();
+render();
+</script>
+</body>
+</html>
