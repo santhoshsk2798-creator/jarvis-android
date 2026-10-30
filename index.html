@@ -1359,7 +1359,49 @@ main > p.muted{
 <button id="listen" class="secondary">🎙 Speak</button>
 <button id="talk" class="secondary">🔊 Voice: On</button>
 </div>
-<p id="answer" role="status" aria-live="polite">SINDRIX is ready. Add your applications below.</p>
+
+  
+<!-- SINDRIX SMART COMMAND SUGGESTIONS -->
+<div class="sd-suggestions">
+
+  <div class="sd-suggestions-title">
+    <span>✦</span>
+    <strong>Suggested Commands</strong>
+  </div>
+
+  <div class="sd-suggestions-grid">
+
+    <button type="button"
+            class="sd-suggestion"
+            data-sd-command="Show my applications">
+      💼 My Applications
+    </button>
+
+    <button type="button"
+            class="sd-suggestion"
+            data-sd-command="Show my interviews">
+      📅 My Interviews
+    </button>
+
+    <button type="button"
+            class="sd-suggestion"
+            data-sd-command="Application summary">
+      📊 Career Summary
+    </button>
+
+    <button type="button"
+            class="sd-suggestion"
+            data-sd-command="Check IBM status">
+      🔎 Check IBM Status
+    </button>
+
+  </div>
+
+</div>
+<!-- END SINDRIX SMART COMMAND SUGGESTIONS -->
+
+  
+  <p id="answer" role="status" aria-live="polite">SINDRIX is ready. Add your applications below.</p>
 </section>
 
 <section class="card">
