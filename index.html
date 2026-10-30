@@ -479,6 +479,143 @@ main > p.muted{
  }
 }
 
+  
+/* SINDRIX COMMAND CENTER SIDEBAR */
+.sd-sidebar{
+ position:fixed;
+ left:16px;
+ top:16px;
+ bottom:16px;
+ width:225px;
+ z-index:100;
+ display:flex;
+ flex-direction:column;
+ padding:17px 12px;
+ background:linear-gradient(160deg,#0a1b2ef5,#030a15f8);
+ border:1px solid #237caa;
+ border-radius:19px;
+ box-shadow:0 0 28px #008cff22;
+}
+.sd-brand{
+ display:flex;
+ align-items:center;
+ gap:12px;
+ padding:10px 6px 22px;
+ border-bottom:1px solid #24516a;
+}
+.sd-brand-logo{
+ flex-shrink:0;
+ width:53px;
+ height:53px;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ border:2px solid #f3c779;
+ border-radius:50%;
+ font:23px Georgia,serif;
+ color:#f3c779;
+ box-shadow:0 0 18px #e9a53c44;
+}
+.sd-brand-logo span{
+ font-size:11px;
+ margin-left:2px;
+}
+.sd-brand strong{
+ color:#f3c779;
+ font:20px Georgia,serif;
+ letter-spacing:2px;
+}
+.sd-brand small{
+ display:block;
+ margin-top:5px;
+ font-size:10px;
+}
+.sd-navigation{
+ display:flex;
+ flex-direction:column;
+ gap:6px;
+ padding-top:20px;
+ overflow-y:auto;
+}
+.sd-nav{
+ width:100%;
+ text-align:left;
+ padding:13px 14px;
+ background:transparent;
+ border:1px solid transparent;
+ border-radius:11px;
+ color:#d9eaff;
+ font-size:14px;
+ font-weight:500;
+ cursor:pointer;
+}
+.sd-nav:hover,
+.sd-nav.active{
+ background:#07355c;
+ border-color:#168dce;
+ color:white;
+ box-shadow:0 0 14px #008cff33;
+}
+.sd-nav small{
+ font-size:9px;
+ color:#91a9bb;
+ float:right;
+}
+.sd-sidebar-footer{
+ margin-top:auto;
+ padding:17px 8px 4px;
+ font-size:12px;
+ color:#a5c2d8;
+}
+.sd-online-dot{
+ display:inline-block;
+ width:8px;
+ height:8px;
+ border-radius:50%;
+ background:#00d6a0;
+ margin-right:6px;
+ box-shadow:0 0 9px #00d6a0;
+}
+.sd-menu-toggle{
+ display:none;
+}
+
+/* Make room for the sidebar on desktop */
+@media(min-width:1101px){
+ body > main{
+  margin-left:255px;
+  margin-right:16px;
+  max-width:none;
+ }
+}
+
+/* Mobile and tablet navigation */
+@media(max-width:1100px){
+ .sd-sidebar{
+  transform:translateX(-120%);
+  transition:transform .3s ease;
+  width:min(280px,85vw);
+  z-index:1001;
+ }
+ .sd-sidebar.sd-open{
+  transform:translateX(0);
+ }
+ .sd-menu-toggle{
+  display:block;
+  position:fixed;
+  top:14px;
+  left:14px;
+  z-index:1002;
+  background:#082642;
+  border:1px solid #27baff;
+  color:#f3c779;
+  box-shadow:0 0 15px #008cff44;
+ }
+ body > main{
+  padding-top:75px;
+ }
+}
+
 </style>
 </head>
 <body>
@@ -512,6 +649,44 @@ main > p.muted{
   <p id="si-percentage">0%</p>
 </div>
 <!-- END SINDRIX STARTUP ANIMATION -->
+
+<!-- SINDRIX PREMIUM NAVIGATION -->
+<button id="sd-menu-toggle"
+        class="sd-menu-toggle"
+        type="button"
+        aria-label="Open navigation"
+        aria-expanded="false"
+        aria-controls="sd-sidebar">
+  ☰
+</button>
+
+<aside id="sd-sidebar" class="sd-sidebar">
+  <div class="sd-brand">
+    <div class="sd-brand-logo">SI <span>♥</span></div>
+    <div>
+      <strong>SINDRIX</strong>
+      <small>Santhosh ♡ Indhu</small>
+    </div>
+  </div>
+
+  <nav class="sd-navigation" aria-label="Main navigation">
+    <button type="button" class="sd-nav active" data-target="home">⌂ &nbsp; Home</button>
+    <button type="button" class="sd-nav" data-target="chat">◉ &nbsp; Chat</button>
+    <button type="button" class="sd-nav" data-target="voice">🎙 &nbsp; Voice</button>
+    <button type="button" class="sd-nav" data-target="career">▣ &nbsp; Career AI</button>
+    <button type="button" class="sd-nav" data-target="applications">✓ &nbsp; Applications</button>
+    <button type="button" class="sd-nav" data-target="calendar">▦ &nbsp; Calendar <small>Coming soon</small></button>
+    <button type="button" class="sd-nav" data-target="emails">✉ &nbsp; Emails <small>Coming soon</small></button>
+    <button type="button" class="sd-nav" data-target="files">▤ &nbsp; Files <small>Coming soon</small></button>
+    <button type="button" class="sd-nav" data-target="settings">⚙ &nbsp; Settings</button>
+  </nav>
+
+  <div class="sd-sidebar-footer">
+    <span class="sd-online-dot"></span>
+    SINDRIX Interface
+  </div>
+</aside>
+<!-- END SINDRIX NAVIGATION -->
 
 
 <main>
@@ -875,6 +1050,48 @@ function startSindrixAnimation(){
 }
 
 startSindrixAnimation();
+  
+/* SINDRIX SIDEBAR CONTROLS */
+const sdMenu=document.getElementById('sd-menu-toggle');
+const sdSidebar=document.getElementById('sd-sidebar');
+
+sdMenu.onclick=()=>{
+ const open=sdSidebar.classList.toggle('sd-open');
+ sdMenu.setAttribute('aria-expanded',String(open));
+ sdMenu.setAttribute('aria-label',
+   open?'Close navigation':'Open navigation');
+};
+
+document.querySelectorAll('.sd-nav').forEach(btn=>{
+ btn.onclick=()=>{
+  const target=btn.dataset.target;
+
+  const destinations={
+   home:'.hero',
+   chat:'#command',
+   voice:'#listen',
+   career:'#stats',
+   applications:'#applications',
+   settings:'#export'
+  };
+
+  if(destinations[target]){
+   document.querySelector(destinations[target])
+     ?.scrollIntoView({behavior:'smooth',block:'start'});
+
+   document.querySelectorAll('.sd-nav')
+     .forEach(b=>b.classList.remove('active'));
+   btn.classList.add('active');
+  }else{
+   alert('This SINDRIX feature is coming soon.');
+  }
+
+  sdSidebar.classList.remove('sd-open');
+  sdMenu.setAttribute('aria-expanded','false');
+  sdMenu.setAttribute('aria-label','Open navigation');
+ };
+});
+
 
 </script>
 </body>
