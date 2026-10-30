@@ -993,6 +993,154 @@ main > p.muted{
  }
 }
 
+
+/* ====================================
+   SINDRIX PREMIUM COMMAND CENTER
+   STEP 8B
+   ==================================== */
+
+/* Command heading */
+.sd-command-heading{
+ display:flex;
+ align-items:center;
+ gap:15px;
+ padding-bottom:20px;
+ margin-bottom:20px;
+ border-bottom:1px solid #235778;
+}
+
+.sd-command-symbol{
+ flex-shrink:0;
+ display:grid;
+ place-items:center;
+ width:52px;
+ height:52px;
+ border:1px solid #e7bc73;
+ border-radius:15px;
+ background:linear-gradient(145deg,#183653,#071525);
+ color:#f3c779;
+ font-size:29px;
+ box-shadow:0 0 20px #d9a94b22;
+}
+
+.sd-command-heading>div{
+ flex:1;
+ min-width:0;
+}
+
+.sd-command-label{
+ display:block;
+ color:#56caff;
+ font-size:10px;
+ letter-spacing:2px;
+ margin-bottom:6px;
+}
+
+.sd-command-heading h2{
+ margin:0 0 5px!important;
+ color:#f3c779!important;
+ font-size:20px!important;
+}
+
+.sd-command-heading small{
+ color:#9cb9cf;
+ font-size:12px;
+}
+
+.sd-command-online{
+ flex-shrink:0;
+ color:#60e6c2;
+ font-size:10px;
+ letter-spacing:1px;
+}
+
+/* Command input */
+#command{
+ min-height:56px;
+ padding:16px 18px;
+ background:linear-gradient(145deg,#071b30,#030b16);
+ border:1px solid #2585b6;
+ border-radius:14px;
+ color:#eefaff;
+ font-size:14px;
+ box-shadow:inset 0 0 20px #007bff10;
+ transition:border-color .25s,box-shadow .25s;
+}
+
+#command:focus{
+ border-color:#4bd5ff;
+ outline:none;
+ box-shadow:
+ 0 0 0 3px #008cff20,
+ 0 0 24px #008cff33;
+}
+
+/* Action buttons */
+#ask{
+ background:linear-gradient(135deg,#e4b668,#ffdb97);
+ border:1px solid #ffe2ac;
+ color:#081421;
+ box-shadow:0 0 18px #dba64c33;
+}
+
+#listen{
+ background:linear-gradient(135deg,#0b4168,#0b6d9b);
+ border:1px solid #39baff;
+ color:#e5f8ff;
+}
+
+#talk{
+ background:#0a2237;
+ border:1px solid #326c90;
+ color:#d9edff;
+}
+
+/* Response display */
+#answer{
+ margin-top:20px;
+ padding:18px;
+ min-height:75px;
+ background:linear-gradient(145deg,#061a2c,#040d19);
+ border:1px solid #235778;
+ border-left:3px solid #e6ba71;
+ border-radius:12px;
+ color:#d8ecfc;
+ line-height:1.7;
+ box-shadow:inset 0 1px 0 #ffffff0a;
+}
+
+/* Mobile refinements */
+@media(max-width:480px){
+ .sd-command-heading{
+  gap:10px;
+  flex-wrap:wrap;
+ }
+
+ .sd-command-symbol{
+  width:43px;
+  height:43px;
+  font-size:24px;
+ }
+
+ .sd-command-heading h2{
+  font-size:17px!important;
+ }
+
+ .sd-command-label{
+  font-size:9px;
+  letter-spacing:1px;
+ }
+
+ .sd-command-online{
+  margin-left:auto;
+ }
+
+ #command{
+  font-size:16px;
+ }
+}
+
+
   
 </style>
 </head>
