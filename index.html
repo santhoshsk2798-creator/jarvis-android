@@ -3751,6 +3751,299 @@ document.querySelectorAll('.sd-suggestion').forEach(button => {
 })();
 
   
+/* =========================================
+   SINDRIX SPECIAL MOMENTS
+   STEP 12C — MEMORIES & COUNTDOWNS
+   Santhosh ♥ Indhu
+   ========================================= */
+
+(function initSindrixMoments() {
+
+  const KEY = 'sindrix_special_moments_v1';
+
+  const form = document.getElementById('sd-moments-form');
+  const list = document.getElementById('sd-moments-list');
+  const total = document.getElementById('sd-moments-total');
+  const countdown = document.getElementById('sd-moments-countdown');
+  const nextName = document.getElementById('sd-moments-next-name');
+
+  if (!form || !list || !total || !countdown || !nextName) {
+    return;
+  }
+
+  const nameInput = document.getElementById('sd-moment-name');
+  const typeInput = document.getElementById('sd-moment-type');
+  const dateInput = document.getElementById('sd-moment-date');
+  const repeatInput = document.getElementById('sd-moment-repeat');
+
+  let moments = [];
+
+  try {
+    const saved = JSON.parse(localStorage.getItem(KEY) || '[]');
+    if (Array.isArray(saved)) moments = saved;
+  } catch (error) {
+    console.warn('Unable to read saved moments:', error);
+  }
+
+  function save() {
+    try {
+      localStorage.setItem(KEY, JSON.stringify(moments));
+      return true;
+    } catch (error) {
+      alert('Unable to save moments in this browser.');
+      console.error(error);
+      return false;
+    }
+  }
+
+  function localToday() {
+    const now = new Date();
+    return new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate()
+    );
+  }
+
+  function parseDate(value) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(value || '')) {
+      return null;
+    }
+
+    const [year, month, day] = value.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
+
+    if (
+      date.getFullYear() !== year ||
+      date.getMonth() !== month - 1 ||
+      date.getDate() !== day
+    ) {
+      return null;
+    }
+
+    return date;
+  }
+
+  function nextOccurrence(moment) {
+    const original = parseDate(moment.date);
+    if (!original) return null;
+
+    const today = localToday();
+
+    if (!moment.repeat) {
+      return original >= today ? original : null;
+    }
+
+    // Annual dates repeat on their original month and day.
+    // Feb 29 anniversaries next occur in a leap year.
+    const month = original.getMonth();
+    const day = original.getDate();
+
+    for (let year = today.getFullYear(); year < today.getFullYear() + 9; year++) {
+      const candidate = new Date(year, month, day);
+
+      if (
+        candidate.getMonth() === month &&
+        candidate.getDate() === day &&
+        candidate >= today
+      ) {
+        return candidate;
+      }
+    }
+
+    return null;
+  }
+
+  function daysUntil(date) {
+    const today = localToday();
+
+    const start = Date.UTC(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate()
+    );
+
+    const end = Date.UTC(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate()
+    );
+
+    return Math.round((end - start) / 86400000);
+  }
+
+  function formatDate(date) {
+    return date.toLocaleDateString('en-IN', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric'
+    });
+  }
+
+  function updateCountdown() {
+    const upcoming = moments
+      .map(moment => ({
+        moment,
+        date: nextOccurrence(moment)
+      }))
+      .filter(item => item.date)
+      .sort((a, b) => a.date - b.date);
+
+    if (!upcoming.length) {
+      countdown.textContent = '♡';
+      nextName.textContent =
+        'A little countdown to something beautiful.';
+      return;
+    }
+
+    const nearest = upcoming[0];
+    const days = daysUntil(nearest.date);
+
+    countdown.textContent =
+      days === 0
+        ? 'Today ♡'
+        : days === 1
+          ? '1 day ♡'
+          : days + ' days ♡';
+
+    nextName.textContent =
+      nearest.moment.name +
+      ' · ' +
+      formatDate(nearest.date);
+  }
+
+  function render() {
+    list.replaceChildren();
+
+    total.textContent =
+      moments.length +
+      (moments.length === 1 ? ' saved' : ' saved');
+
+    updateCountdown();
+
+    if (!moments.length) {
+      const empty = document.createElement('p');
+      empty.className = 'sd-moments-empty';
+      empty.textContent = 'Our story begins here. ♡';
+      list.appendChild(empty);
+      return;
+    }
+
+    const sorted = [...moments].sort((a, b) => {
+      const aDate = nextOccurrence(a);
+      const bDate = nextOccurrence(b);
+
+      if (!aDate && !bDate) return 0;
+      if (!aDate) return 1;
+      if (!bDate) return -1;
+
+      return aDate - bDate;
+    });
+
+    sorted.forEach(moment => {
+      const card = document.createElement('div');
+      card.className = 'sd-moment-card';
+
+      const symbol = document.createElement('span');
+      symbol.textContent =
+        moment.type === 'Birthday' ? '🎂' :
+        moment.type === 'Anniversary' ? '♡' :
+        moment.type === 'Memory' ? '✨' :
+        moment.type === 'Celebration' ? '🥂' : '✦';
+
+      symbol.style.fontSize = '24px';
+
+      const details = document.createElement('div');
+      details.className = 'sd-moment-card-details';
+
+      const title = document.createElement('strong');
+      title.textContent = moment.name;
+
+      const info = document.createElement('small');
+      const nextDate = nextOccurrence(moment);
+
+      info.textContent =
+        moment.type +
+        ' · ' +
+        moment.date +
+        (moment.repeat ? ' · Every year' : '') +
+        (nextDate
+          ? ' · ' + daysUntil(nextDate) + ' days to go'
+          : ' · Past event');
+
+      details.append(title, info);
+
+      const remove = document.createElement('button');
+      remove.type = 'button';
+      remove.className = 'sd-moment-delete';
+      remove.textContent = '✕';
+      remove.title = 'Delete moment';
+      remove.setAttribute('aria-label', 'Delete ' + moment.name);
+
+      remove.addEventListener('click', () => {
+        if (!confirm('Delete this special moment?')) return;
+
+        const previous = [...moments];
+
+        moments = moments.filter(item => item.id !== moment.id);
+
+        if (!save()) {
+          moments = previous;
+        }
+
+        render();
+      });
+
+      card.append(symbol, details, remove);
+      list.appendChild(card);
+    });
+  }
+
+  form.addEventListener('submit', event => {
+    event.preventDefault();
+
+    const name = nameInput.value.trim();
+    const date = dateInput.value;
+
+    if (!name || !parseDate(date)) {
+      alert('Please enter a name and valid date.');
+      return;
+    }
+
+    const moment = {
+      id: window.crypto && crypto.randomUUID
+        ? crypto.randomUUID()
+        : Date.now().toString() + Math.random().toString(36),
+      name,
+      type: typeInput.value,
+      date,
+      repeat: repeatInput.checked
+    };
+
+    moments.unshift(moment);
+
+    if (!save()) {
+      moments.shift();
+      render();
+      return;
+    }
+
+    form.reset();
+    repeatInput.checked = true;
+
+    render();
+    nameInput.focus();
+  });
+
+  render();
+
+  // Recalculate countdown when returning to the app
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) render();
+  });
+
+})();
+
   
 </script>
 </body>
