@@ -11686,5 +11686,350 @@ console.info(
   }
 })();
 </script>
+
+<!-- SINDRIX COMPANY TRACKER -->
+<style>
+#si-jobs-panel {
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:9000;
+  overflow-y:auto;
+  background:#030710;
+  color:#eef7ff;
+  padding:20px;
+  font-family:system-ui,Arial,sans-serif;
+}
+.si-jobs-wrap {
+  max-width:850px;
+  margin:auto;
+}
+.si-jobs-title {
+  color:#f3c779;
+  font-size:26px;
+  margin:15px 0;
+}
+.si-job-card {
+  background:#0b2035;
+  border:1px solid #245b80;
+  border-radius:16px;
+  padding:17px;
+  margin:12px 0;
+}
+.si-job-card h3 {
+  color:#f3c779;
+  margin:0 0 8px;
+}
+.si-job-card p {
+  color:#b6cede;
+  font-size:13px;
+}
+.si-job-btn {
+  background:#0da7d5;
+  color:#03101c;
+  padding:11px 15px;
+  border:0;
+  border-radius:10px;
+  cursor:pointer;
+  margin:5px 5px 5px 0;
+  font-weight:700;
+}
+.si-job-btn.gold {
+  background:#f3c779;
+}
+.si-job-btn.dark {
+  background:#17344d;
+  color:#eef7ff;
+}
+.si-job-status {
+  color:#73d9ff;
+  font-weight:600;
+}
+.si-job-select {
+  width:100%;
+  background:#071a2b;
+  color:white;
+  padding:12px;
+  border:1px solid #346078;
+  border-radius:10px;
+}
+</style>
+
+<div id="si-jobs-panel">
+  <div class="si-jobs-wrap">
+    <button class="si-job-btn dark"
+      onclick="siCloseJobs()">← Dashboard</button>
+
+    <h1 class="si-jobs-title">
+      SINDRIX ♥ Career Intelligence
+    </h1>
+
+    <p>Applied Jobs • Company Tracker</p>
+
+    <div id="si-jobs-list"></div>
+    <div id="si-job-detail" style="display:none"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  const KEY = "jarvis_apps_v1";
+
+  function getJobs() {
+    try {
+      const data = JSON.parse(
+        localStorage.getItem(KEY) || "[]"
+      );
+      return Array.isArray(data) ? data : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function saveJobs(jobs) {
+    localStorage.setItem(KEY, JSON.stringify(jobs));
+  }
+
+  function escapeHTML(value) {
+    return String(value == null ? "" : value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  function safeURL(url) {
+    try {
+      const u = new URL(url);
+      return ["https:", "http:"].includes(u.protocol)
+        ? u.href : "";
+    } catch (e) {
+      return "";
+    }
+  }
+
+  function companyKey(name) {
+    return String(name || "")
+      .trim().toLowerCase();
+  }
+
+  function getCompanies() {
+    const grouped = new Map();
+
+    getJobs().forEach(function(job, index) {
+      if (!job || !job.company) return;
+
+      const key = companyKey(job.company);
+
+      if (!grouped.has(key)) {
+        grouped.set(key, {
+          name:job.company,
+          jobs:[]
+        });
+      }
+
+      grouped.get(key).jobs.push({
+        ...job,
+        storageIndex:index
+      });
+    });
+
+    return Array.from(grouped.values())
+      .sort((a,b) => a.name.localeCompare(b.name));
+  }
+
+  window.siOpenJobs = function() {
+    document.getElementById("si-jobs-panel")
+      .style.display = "block";
+
+    document.getElementById("si-job-detail")
+      .style.display = "none";
+
+    document.getElementById("si-jobs-list")
+      .style.display = "block";
+
+    siRenderCompanies();
+  };
+
+  window.siCloseJobs = function() {
+    document.getElementById("si-jobs-panel")
+      .style.display = "none";
+  };
+
+  window.siRenderCompanies = function() {
+    const companies = getCompanies();
+    const list = document.getElementById("si-jobs-list");
+    list.innerHTML = "";
+
+    if (!companies.length) {
+      list.textContent =
+        "No applications saved yet. Add jobs from your dashboard.";
+      return;
+    }
+
+    companies.forEach(function(company) {
+      const card = document.createElement("div");
+      card.className = "si-job-card";
+
+      const heading = document.createElement("h3");
+      heading.textContent = company.name;
+
+      const count = document.createElement("p");
+      count.textContent =
+        company.jobs.length + " application(s)";
+
+      const button = document.createElement("button");
+      button.className = "si-job-btn gold";
+      button.textContent = "View Details →";
+      button.onclick = function() {
+        siShowCompany(company.name);
+      };
+
+      card.append(heading, count, button);
+      list.appendChild(card);
+    });
+  };
+
+  window.siShowCompany = function(name) {
+    const company = getCompanies().find(
+      c => companyKey(c.name) === companyKey(name)
+    );
+
+    if (!company) return;
+
+    const detail = document.getElementById("si-job-detail");
+    const list = document.getElementById("si-jobs-list");
+
+    list.style.display = "none";
+    detail.style.display = "block";
+    detail.innerHTML = "";
+
+    const back = document.createElement("button");
+    back.className = "si-job-btn dark";
+    back.textContent = "← All Companies";
+    back.onclick = function() {
+      detail.style.display = "none";
+      list.style.display = "block";
+      siRenderCompanies();
+    };
+    detail.appendChild(back);
+
+    const title = document.createElement("h2");
+    title.className = "si-jobs-title";
+    title.textContent = company.name;
+    detail.appendChild(title);
+
+    company.jobs.forEach(function(job) {
+      const card = document.createElement("div");
+      card.className = "si-job-card";
+
+      const role = document.createElement("h3");
+      role.textContent = job.role || "Job application";
+
+      const date = document.createElement("p");
+      date.textContent =
+        "Application date: " + (job.date || "Not recorded");
+
+      const statusLabel = document.createElement("p");
+      statusLabel.textContent = "Application status:";
+
+      const select = document.createElement("select");
+      select.className = "si-job-select";
+
+      const statuses = [
+        "Applied", "Screening", "Assessment",
+        "Interview", "Selected", "Rejected",
+        "Withdrawn"
+      ];
+
+      if (job.status && !statuses.includes(job.status)) {
+        statuses.unshift(job.status);
+      }
+
+      statuses.forEach(function(status) {
+        const option = document.createElement("option");
+        option.value = status;
+        option.textContent = status;
+        select.appendChild(option);
+      });
+
+      select.value = job.status || "Applied";
+
+      select.onchange = function() {
+        const jobs = getJobs();
+
+        if (jobs[job.storageIndex]) {
+          jobs[job.storageIndex].status = select.value;
+          saveJobs(jobs);
+        }
+      };
+
+      card.append(role, date, statusLabel, select);
+
+      if (job.notes) {
+        const notes = document.createElement("p");
+        notes.textContent = job.notes;
+        card.appendChild(notes);
+      }
+
+      const link = safeURL(job.link);
+
+      if (link) {
+        const open = document.createElement("button");
+        open.className = "si-job-btn gold";
+        open.textContent = "Open Job Portal ↗";
+        open.onclick = function() {
+          window.open(link, "_blank", "noopener,noreferrer");
+        };
+        card.appendChild(open);
+      }
+
+      detail.appendChild(card);
+    });
+
+    const gmail = document.createElement("div");
+    gmail.className = "si-job-card";
+
+    const gmailTitle = document.createElement("h3");
+    gmailTitle.textContent = "Gmail Updates";
+
+    const gmailText = document.createElement("p");
+    gmailText.textContent =
+      "Search Gmail for messages related to " +
+      company.name + ". No Gmail API required.";
+
+    const gmailButton = document.createElement("button");
+    gmailButton.className = "si-job-btn";
+    gmailButton.textContent = "Search Gmail ↗";
+
+    gmailButton.onclick = function() {
+      const query = '"' + company.name + '"';
+      const url = "https://mail.google.com/mail/u/0/#search/" +
+        encodeURIComponent(query);
+
+      window.open(url, "_blank", "noopener,noreferrer");
+    };
+
+    gmail.append(gmailTitle, gmailText, gmailButton);
+    detail.appendChild(gmail);
+  };
+
+  // Floating button to open the company tracker
+  const launcher = document.createElement("button");
+  launcher.textContent = "💼 Applied Companies";
+  launcher.className = "si-job-btn gold";
+  launcher.style.cssText =
+    "position:fixed;bottom:18px;right:18px;" +
+    "z-index:8000;box-shadow:0 0 20px #0008";
+
+  launcher.onclick = window.siOpenJobs;
+  document.body.appendChild(launcher);
+})();
+</script>
+<!-- END SINDRIX COMPANY TRACKER -->
+
 </body>
 </html>
