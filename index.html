@@ -12194,5 +12194,311 @@ onAuthStateChanged(auth, user => {
 <!-- END SINDRIX FIREBASE SIGN-IN -->
 
    
+<!-- SINDRIX PRIVATE LIVE CHAT -->
+<style>
+#si-private-chat-btn {
+  position:fixed;
+  bottom:140px;
+  right:18px;
+  z-index:8501;
+  padding:12px 16px;
+  border:1px solid #d9ac58;
+  border-radius:25px;
+  background:#071827;
+  color:#f3ca77;
+  font-weight:bold;
+  cursor:pointer;
+  display:none;
+}
+#si-private-chat {
+  position:fixed;
+  inset:4% 3%;
+  max-width:520px;
+  margin:auto;
+  z-index:9500;
+  display:none;
+  flex-direction:column;
+  border:1px solid #c69a4e;
+  border-radius:18px;
+  background:#06111f;
+  color:#f5e9d0;
+  box-shadow:0 12px 45px #000b;
+  overflow:hidden;
+  font-family:system-ui,Arial,sans-serif;
+}
+#si-chat-header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:16px;
+  background:#10263b;
+  color:#f3ca77;
+}
+#si-chat-close {
+  border:0;
+  background:transparent;
+  color:white;
+  font-size:24px;
+  cursor:pointer;
+}
+#si-chat-status {
+  padding:8px 14px;
+  font-size:12px;
+  color:#c7b58e;
+}
+#si-chat-list {
+  flex:1;
+  overflow-y:auto;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  padding:16px;
+}
+.si-chat-msg {
+  max-width:82%;
+  padding:11px 14px;
+  border-radius:13px;
+  overflow-wrap:anywhere;
+  white-space:pre-wrap;
+  background:#173047;
+}
+.si-chat-own {
+  align-self:flex-end;
+  background:#67502a;
+  color:#fff2d5;
+}
+.si-chat-other {
+  align-self:flex-start;
+}
+#si-chat-form {
+  display:flex;
+  gap:8px;
+  padding:12px;
+  background:#10263b;
+}
+#si-chat-input {
+  flex:1;
+  min-width:0;
+  padding:12px;
+  border:1px solid #816d48;
+  border-radius:10px;
+  background:#071827;
+  color:white;
+}
+#si-chat-send {
+  padding:10px 15px;
+  border:0;
+  border-radius:10px;
+  background:#e5b85d;
+  color:#071827;
+  font-weight:bold;
+  cursor:pointer;
+}
+</style>
+
+<button id="si-private-chat-btn" type="button">
+  ♥ Private Chat
+</button>
+
+<section id="si-private-chat"
+  aria-label="SINDRIX Private Messenger">
+
+  <div id="si-chat-header">
+    <strong>♥ SINDRIX Messenger</strong>
+    <button id="si-chat-close"
+      type="button" aria-label="Close">×</button>
+  </div>
+
+  <div id="si-chat-status">Connecting...</div>
+  <div id="si-chat-list"></div>
+
+  <form id="si-chat-form">
+    <input id="si-chat-input"
+      maxlength="4000"
+      placeholder="Type your message..."
+      autocomplete="off"
+      required>
+    <button id="si-chat-send" type="submit">
+      Send
+    </button>
+  </form>
+</section>
+
+<script type="module">
+import {
+  getApp
+} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+
+import {
+  getAuth,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  query,
+  orderBy,
+  onSnapshot,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+
+const app = getApp();
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const allowedUIDs = [
+  "k7rrMaWlc4ZOnmS6W5CqHPQtGVK2",
+  "67vL6mjw1dfwr4nfNTu7ReTN8Ps2"
+];
+
+const openBtn = document.getElementById(
+  "si-private-chat-btn"
+);
+const chatPanel = document.getElementById(
+  "si-private-chat"
+);
+const closeBtn = document.getElementById(
+  "si-chat-close"
+);
+const chatList = document.getElementById(
+  "si-chat-list"
+);
+const chatForm = document.getElementById(
+  "si-chat-form"
+);
+const chatInput = document.getElementById(
+  "si-chat-input"
+);
+const sendBtn = document.getElementById(
+  "si-chat-send"
+);
+const chatStatus = document.getElementById(
+  "si-chat-status"
+);
+
+const chatCollection = collection(
+  db,
+  "privateChats",
+  "si-indhu",
+  "messages"
+);
+
+let unsubscribe = null;
+
+function authorized(user) {
+  return !!user && allowedUIDs.includes(user.uid);
+}
+
+function stopChat() {
+  if (unsubscribe) {
+    unsubscribe();
+    unsubscribe = null;
+  }
+}
+
+function startChat() {
+  stopChat();
+
+  if (!authorized(auth.currentUser)) return;
+
+  const chatQuery = query(
+    chatCollection,
+    orderBy("createdAt", "asc")
+  );
+
+  chatStatus.textContent = "Connecting...";
+
+  unsubscribe = onSnapshot(
+    chatQuery,
+    snapshot => {
+      chatList.replaceChildren();
+
+      snapshot.forEach(messageDoc => {
+        const data = messageDoc.data();
+        const bubble = document.createElement("div");
+
+        bubble.className = "si-chat-msg " +
+          (data.senderId === auth.currentUser?.uid
+            ? "si-chat-own"
+            : "si-chat-other");
+
+        bubble.textContent = data.text || "";
+        chatList.appendChild(bubble);
+      });
+
+      chatList.scrollTop = chatList.scrollHeight;
+      chatStatus.textContent = "Connected";
+    },
+    error => {
+      chatStatus.textContent =
+        "Connection error: " + error.code;
+      console.error("SINDRIX chat:", error);
+    }
+  );
+}
+
+openBtn.addEventListener("click", () => {
+  if (!authorized(auth.currentUser)) return;
+
+  chatPanel.style.display = "flex";
+  startChat();
+});
+
+closeBtn.addEventListener("click", () => {
+  chatPanel.style.display = "none";
+  stopChat();
+});
+
+onAuthStateChanged(auth, user => {
+  stopChat();
+  chatList.replaceChildren();
+
+  const allowed = authorized(user);
+  openBtn.style.display = allowed ? "block" : "none";
+
+  if (!allowed) {
+    chatPanel.style.display = "none";
+    chatStatus.textContent = "Access restricted";
+  } else if (chatPanel.style.display === "flex") {
+    startChat();
+  }
+});
+
+chatForm.addEventListener("submit", async event => {
+  event.preventDefault();
+
+  const user = auth.currentUser;
+  const text = chatInput.value.trim();
+
+  if (!authorized(user) ||
+      !text ||
+      text.length > 4000) return;
+
+  sendBtn.disabled = true;
+
+  try {
+    await addDoc(chatCollection, {
+      senderId: user.uid,
+      text: text,
+      createdAt: serverTimestamp()
+    });
+
+    chatInput.value = "";
+    chatStatus.textContent = "Message sent";
+  } catch (error) {
+    chatStatus.textContent =
+      "Send failed: " + error.code;
+    console.error(error);
+  } finally {
+    sendBtn.disabled = false;
+  }
+});
+</script>
+<!-- END SINDRIX PRIVATE LIVE CHAT -->
+
+
+   
 </body>
 </html>
