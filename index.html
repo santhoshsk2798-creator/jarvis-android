@@ -12031,5 +12031,58 @@ console.info(
 </script>
 <!-- END SINDRIX COMPANY TRACKER -->
 
+<script>
+/* SINDRIX APPLIED COMPANIES CLICK REPAIR */
+(function () {
+  "use strict";
+
+  function openCompanies() {
+    const panel = document.getElementById("si-jobs-panel");
+
+    if (panel) {
+      panel.style.setProperty(
+        "display", "block", "important"
+      );
+
+      const list = document.getElementById("si-jobs-list");
+      const detail = document.getElementById("si-job-detail");
+
+      if (list) list.style.display = "block";
+      if (detail) detail.style.display = "none";
+
+      if (typeof window.siRenderCompanies === "function") {
+        window.siRenderCompanies();
+      }
+
+      console.log("SINDRIX company tracker opened");
+      return;
+    }
+
+    // Fallback to existing Applications page
+    if (typeof window.sdOpenPage === "function") {
+      window.sdOpenPage("applications");
+    } else {
+      window.location.hash = "applications";
+    }
+  }
+
+  document.addEventListener("click", function (event) {
+    const button = event.target.closest("button");
+
+    if (!button) return;
+
+    if (
+      button.textContent.includes("Applied Companies")
+    ) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      openCompanies();
+    }
+  }, true);
+
+  console.log("SINDRIX company click repair loaded");
+})();
+</script>
+
 </body>
 </html>
