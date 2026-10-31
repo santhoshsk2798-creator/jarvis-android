@@ -1,7 +1,38 @@
-
 <!doctype html>
 <html lang="en">
 <head>
+<script>
+/* ONE-TIME IMPORT: adds job applications found in Gmail on 31 Oct 2026.
+   Runs before the app starts. Only adds; skips entries already saved
+   (same company, role and date). Runs once per device, so applications
+   you later delete will not come back. */
+(function(){
+ try{
+  var FLAG = "sindrix_import_gmail_2026_10_31";
+  if(localStorage.getItem(FLAG)) return;
+  var KEY = "jarvis_apps_v1";
+  var INCOMING = [{"id":"import-2026-10-31-01","company":"Mercedes-Benz R&D India","role":"Data Engineer (MER00048GU)","location":"","status":"Applied","date":"2026-10-31","link":"https://tas-daimler.taleo.net/careersection/ex/profile.ftl?lang=en&alt=1","notes":"Application received, under review Next: Check spam folder / email for next steps Source: Mercedes careers (Taleo)","createdAt":"2026-10-31T06:30:00.000Z"},{"id":"import-2026-10-31-02","company":"Capgemini","role":"Senior Data Engineer","location":"","status":"Applied","date":"2026-10-30","link":"http://career5.successfactors.eu/careers?company=capgemitecP3&clientId=jobs2web&lang=en_GB&navBarLevel=MY_PROFILE","notes":"Separate from the 9 Oct Naukri application of the same title; may be a re-application Next: Wait for Talent Acquisition Source: Capgemini careers","createdAt":"2026-10-31T06:30:00.000Z"},{"id":"import-2026-10-31-03","company":"Amazon","role":"Data Engineer II, SPIA (ID 10590307)","location":"","status":"Applied","date":"2026-10-30","link":"https://account.amazon.jobs/candidate/dashboard/applications","notes":"Next: Watch Amazon application dashboard Source: Amazon.jobs","createdAt":"2026-10-31T06:30:00.000Z"},{"id":"import-2026-10-31-04","company":"PwC","role":"AWS Data Engineer (Bangalore)","location":"Bangalore","status":"Applied","date":"2026-10-28","link":"https://pwc.wd3.myworkdayjobs.com/Global_Experienced_Careers/login","notes":"Date is the confirmation email date Next: Check candidate portal for tasks Source: PwC Workday","createdAt":"2026-10-31T06:30:00.000Z"},{"id":"import-2026-10-31-05","company":"JPMorgan Chase","role":"Data Engineer III - Databricks, PySpark, Python, AWS (210790269)","location":"","status":"Applied","date":"2026-10-27","link":"https://jpmc.fa.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1001/my-profile/sign-in","notes":"Next: Check candidate profile for status Source: JPMC careers (Oracle)","createdAt":"2026-10-31T06:30:00.000Z"},{"id":"import-2026-10-31-06","company":"IBM","role":"Data Engineer-Data Platforms-AWS (Ref 138044)","location":"","status":"Screening","date":"2026-10-27","link":"","notes":"Assessment invite received 27 Oct; I couldn't tell if these are done Next: Complete coding, recorded video and English assessments; submit accommodation form first Source: IBM careers","createdAt":"2026-10-31T06:30:00.000Z"},{"id":"import-2026-10-31-07","company":"Disney","role":"Sr Data Engineer I","location":"","status":"Applied","date":"2026-10-27","link":"","notes":"Next: Wait / check Candidate Hub Source: Disney careers","createdAt":"2026-10-31T06:30:00.000Z"},{"id":"import-2026-10-31-08","company":"LTIMindtree (LTM)","role":"Data Engineer","location":"","status":"Applied","date":"2026-10-27","link":"https://www.naukri.com/job-listings-171026008854","notes":"One of 9 Naukri applications that day Source: Naukri","createdAt":"2026-10-31T06:30:00.000Z"},{"id":"import-2026-10-31-09","company":"EXL Service","role":"AWS Data Engineer","location":"","status":"Applied","date":"2026-10-26","link":"https://www.naukri.com/job-listings-191026006365","notes":"One of 3 Naukri applications that day Source: Naukri","createdAt":"2026-10-31T06:30:00.000Z"},{"id":"import-2026-10-31-10","company":"LTM","role":"AWS Data Engineer","location":"","status":"Applied","date":"2026-10-10","link":"https://www.naukri.com/job-listings-081026027011","notes":"Source: Naukri","createdAt":"2026-10-31T06:30:00.000Z"},{"id":"import-2026-10-31-11","company":"Capgemini Technology Services India","role":"Senior Data Engineer","location":"","status":"Applied","date":"2026-10-09","link":"https://www.naukri.com/job-listings-091026912342","notes":"One of 4 Naukri applications that day Source: Naukri","createdAt":"2026-10-31T06:30:00.000Z"},{"id":"import-2026-10-31-12","company":"LTM","role":"AWS Glue","location":"","status":"Applied","date":"2026-10-08","link":"","notes":"See Interviews & Actions for LTM interview emails Source: RippleHire (LTM)","createdAt":"2026-10-31T06:30:00.000Z"},{"id":"import-2026-10-31-13","company":"LTM","role":"Specialist - Data Engineering","location":"","status":"Interview","date":"2026-10-29","link":"","notes":"Date shown is the latest email date; application date unknown. Video interview was set for 29 Oct 3:30-4:00 PM IST; I couldn't confirm it took place Next: Confirm outcome with recruiter Ishita Singh Source: RippleHire (LTM)","createdAt":"2026-10-31T06:30:00.000Z"},{"id":"import-2026-10-31-14","company":"EPAM","role":"Data Software Engineering (technical interview)","location":"","status":"Interview","date":"2026-10-30","link":"","notes":"Date shown is the latest email date; application date unknown. 30 Oct interview was moved several times, then cancelled; EPAM said it will reach out Next: Wait for EPAM to reschedule; follow up with coordinator if no word Source: EPAM interview platform","createdAt":"2026-10-31T06:30:00.000Z"},{"id":"import-2026-10-31-15","company":"Accenture","role":"Via agency (Professional Connect)","location":"","status":"Applied","date":"2026-10-07","link":"https://mycareer.accenture.com","notes":"Email said to apply within 7 days or it's treated as a no (deadline about 14 Oct) Next: Check if you renewed the application on Accenture's site Source: Recruitment agency","createdAt":"2026-10-31T06:30:00.000Z"},{"id":"import-2026-10-31-16","company":"Cognizant","role":"In-person interview, Kochi / Coimbatore","location":"Kochi / Coimbatore","status":"Screening","date":"2026-10-22","link":"https://forms.cloud.microsoft/r/CaNvqeQgL8","notes":"Date shown is the latest email date; application date unknown. Form was due 27 Oct 12 PM for interviews on 31 Oct Next: Confirm whether you filled the availability form; no interview invite seen Source: HR email","createdAt":"2026-10-31T06:30:00.000Z"}];
+  var raw = localStorage.getItem(KEY);
+  var existing = raw === null ? [] : JSON.parse(raw);
+  if(!Array.isArray(existing)) return;
+  var key = function(a){
+   return [a.company, a.role, a.date].map(function(x){
+    return String(x || "").trim().toLowerCase();
+   }).join("|");
+  };
+  var seen = {};
+  existing.forEach(function(a){ if(a && typeof a === "object") seen[key(a)] = true; });
+  var merged = existing.slice();
+  INCOMING.forEach(function(a){
+   if(!seen[key(a)]){ merged.push(a); seen[key(a)] = true; }
+  });
+  localStorage.setItem(KEY, JSON.stringify(merged));
+  localStorage.setItem(FLAG, "1");
+ }catch(e){
+  console.warn("Application import skipped:", e);
+ }
+})();
+</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#071321">
