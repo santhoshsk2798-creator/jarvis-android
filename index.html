@@ -12084,5 +12084,115 @@ console.info(
 })();
 </script>
 
+   
+<!-- SINDRIX FIREBASE GOOGLE SIGN-IN -->
+<style>
+#si-google-login {
+  position:fixed;
+  bottom:75px;
+  right:18px;
+  z-index:8500;
+  max-width:290px;
+  padding:14px;
+  border:1px solid #b48c47;
+  border-radius:15px;
+  background:#071827;
+  color:#f3c779;
+  box-shadow:0 0 22px #0009;
+  font-family:system-ui,Arial,sans-serif;
+}
+#si-google-login button {
+  padding:10px 14px;
+  border:0;
+  border-radius:9px;
+  background:#f3c779;
+  color:#081421;
+  font-weight:bold;
+  cursor:pointer;
+}
+#si-google-status {
+  margin-top:9px;
+  font-size:12px;
+  overflow-wrap:anywhere;
+}
+</style>
+
+<div id="si-google-login">
+  <div style="font-weight:bold;margin-bottom:10px">
+    ♥ SINDRIX Private Messenger
+  </div>
+
+  <button id="si-google-button" type="button">
+    Continue with Google
+  </button>
+
+  <div id="si-google-status">
+    Not signed in
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from
+  "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signOut,
+  onAuthStateChanged
+} from
+  "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBOVxoLMZGf67NM7E8P5y3g89eC-mayhh0",
+  authDomain: "sindrix-private-messenger.firebaseapp.com",
+  projectId: "sindrix-private-messenger",
+  storageBucket: "sindrix-private-messenger.firebasestorage.app",
+  messagingSenderId: "327772499027",
+  appId: "1:327772499027:web:47938fc1713c98c93deaa6"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+
+const button = document.getElementById(
+  "si-google-button"
+);
+const status = document.getElementById(
+  "si-google-status"
+);
+
+button.addEventListener("click", async () => {
+  try {
+    if (auth.currentUser) {
+      await signOut(auth);
+    } else {
+      await signInWithPopup(auth, provider);
+    }
+  } catch (error) {
+    console.error("Firebase sign-in error:", error);
+    status.textContent =
+      "Sign-in failed: " + error.code;
+  }
+});
+
+onAuthStateChanged(auth, user => {
+  if (user) {
+    status.textContent =
+      "Signed in: " + user.displayName +
+      " | UID: " + user.uid;
+
+    button.textContent = "Sign Out";
+  } else {
+    status.textContent = "Not signed in";
+    button.textContent = "Continue with Google";
+  }
+});
+</script>
+<!-- END SINDRIX FIREBASE SIGN-IN -->
+
+   
 </body>
 </html>
